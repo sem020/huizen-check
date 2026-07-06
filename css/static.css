@@ -1,0 +1,54 @@
+/* Gedeelde stijl voor Over, Voorwaarden, Privacy */
+.static-pagina{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  background:#f1f5f9;color:#0f172a;line-height:1.6;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+.static-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px;background:rgba(255,255,255,.92);
+  border-bottom:1px solid rgba(15,23,42,.06);
+  position:sticky;top:0;z-index:10;
+  backdrop-filter:blur(12px);
+}
+.static-merk{
+  font-size:1.15rem;font-weight:800;letter-spacing:-.03em;
+  color:#0f172a;text-decoration:none;
+}
+.static-merk i{color:#0d9488;font-style:normal}
+.static-nav{display:flex;gap:8px}
+.static-nav-link{
+  font-size:.78rem;font-weight:700;color:#475569;text-decoration:none;
+  padding:7px 14px;border-radius:100px;transition:background .15s,color .15s;
+}
+.static-nav-link:hover{color:#0d9488;background:rgba(204,251,241,.5)}
+.static-nav-link.is-actief{color:#0d9488;background:#ccfbf1}
+.static-inhoud{
+  flex:1;max-width:640px;width:100%;margin:0 auto;
+  padding:40px 24px 48px;
+}
+.static-inhoud h1{
+  font-size:1.65rem;font-weight:800;letter-spacing:-.03em;
+  margin-bottom:10px;line-height:1.15;
+}
+.static-inhoud .intro{font-size:.95rem;color:#475569;font-weight:500;margin-bottom:8px}
+.static-inhoud h2{
+  font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+  color:#475569;margin-top:28px;margin-bottom:8px;font-weight:700;
+}
+.static-inhoud p,.static-inhoud li{font-size:.9rem;color:#475569;font-weight:500}
+.static-inhoud ul{padding-left:1.2rem;margin:8px 0}
+.static-inhoud .bron-lijst{list-style:none;padding:0;margin:12px 0}
+.static-inhoud .bron-lijst li{
+  padding:8px 0;border-bottom:1px solid rgba(15,23,42,.06);font-size:.88rem;
+}
+.static-inhoud a{color:#0d9488;font-weight:600;text-decoration:none}
+.static-inhoud a:hover{text-decoration:underline}
+.static-voet{
+  text-align:center;padding:20px 24px;
+  font-size:.72rem;color:#64748b;font-weight:500;
+  border-top:1px solid rgba(15,23,42,.06);
+  background:rgba(255,255,255,.6);
+}
+.static-voet a{color:#0d9488;text-decoration:none;font-weight:600;margin:0 4px}
+.static-voet a:hover{text-decoration:underline}

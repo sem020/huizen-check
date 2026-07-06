@@ -5,9 +5,11 @@ import { laadBag } from './bag.js';
 import { laadWoz } from './woz.js';
 import { vulBronnen } from './bronnen.js';
 import { resetDossierState, dossierState } from './state.js';
-import { updatePremiumUi, applyPendingUnlock } from './premium.js';
+import { applyPendingUnlock, updatePremiumUi } from './premium.js';
 
-export function toonDossier(doc) {
+export async function toonDossier(doc) {
+  if (!doc?.weergavenaam) throw new Error('ongeldig adres');
+
   resetDossierState();
   dossierState.doc = doc;
 
@@ -39,7 +41,7 @@ export function toonDossier(doc) {
 export async function openDossier(lookupId) {
   const r = await fetch(`${LS}/lookup?id=${encodeURIComponent(lookupId)}&fl=*`);
   const doc = (await r.json()).response?.docs?.[0];
-  if (doc) toonDossier(doc);
+  if (doc) await toonDossier(doc);
 }
 
 export function sluitDossier(input) {
@@ -47,6 +49,7 @@ export function sluitDossier(input) {
   $('stage').classList.remove('weg');
   resetKaart();
   resetDossierState();
+  updatePremiumUi();
   input.focus();
   input.select();
 }

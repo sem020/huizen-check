@@ -1,7 +1,6 @@
 import { WFS, $ } from './config.js';
 import { padBag } from './utils.js';
 import { dossierState } from './state.js';
-import { updatePremiumUi } from './premium.js';
 
 function bagFilter(field, value) {
   return `<Filter><PropertyIsEqualTo><PropertyName>${field}</PropertyName><Literal>${value}</Literal></PropertyIsEqualTo></Filter>`;
@@ -52,5 +51,4 @@ export async function laadBag(doc) {
     $('chips').innerHTML = `<span class="chip">BAG-details tijdelijk niet bereikbaar — <a style="color:var(--accent)" href="https://bagviewer.kadaster.nl/" target="_blank" rel="noopener">open BAG Viewer</a></span>`;
   }
   dossierState.klaar.bag = true;
-  updatePremiumUi();
 }

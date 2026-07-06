@@ -1,18 +1,67 @@
 import { LS, $ } from './config.js';
 import { splitsNaam } from './utils.js';
-import { openDossier, toonDossier } from './dossier.js';
+import { toonDossier } from './dossier.js';
 
 let deb;
 
-function netwerkFout(melding) {
+function toonFout(melding, html) {
   melding.style.display = 'block';
-  melding.innerHTML = `Geen verbinding met de PDOK-API. <b>Bekijk je dit in een sandbox-preview?</b> Die blokkeert externe API's — start een lokale server of zet het op je hosting.`;
+  melding.innerHTML = html;
+}
+
+function verbergFout(melding) {
+  melding.style.display = 'none';
+  melding.textContent = '';
+}
+
+function netwerkFout(melding) {
+  toonFout(melding,
+    `Geen verbinding met de PDOK-API. Open Panddossier via een <b>lokale server</b> of je hosting — niet als bestand op je computer (<code>file://</code>).`
+  );
+}
+
+function protocolCheck(melding) {
+  if (location.protocol === 'file:') {
+    toonFout(melding,
+      'Panddossier werkt niet als los bestand. Start een lokale server: <code>python3 -m http.server 8000</code> en open <code>http://localhost:8000</code>.'
+    );
+    return false;
+  }
+  return true;
+}
+
+async function haalAdresOp(query) {
+  const r = await fetch(`${LS}/free?q=${encodeURIComponent(query)}&fq=type:adres&rows=1&fl=*`);
+  if (!r.ok) throw new Error('pdok ' + r.status);
+  return (await r.json()).response?.docs?.[0] || null;
+}
+
+async function haalAdresOpId(id) {
+  const r = await fetch(`${LS}/lookup?id=${encodeURIComponent(id)}&fl=*`);
+  if (!r.ok) throw new Error('pdok ' + r.status);
+  return (await r.json()).response?.docs?.[0] || null;
+}
+
+async function openAdres(doc, melding) {
+  if (!doc?.weergavenaam) {
+    toonFout(melding, 'Geen adres gevonden — probeer straat + huisnummer + plaats.');
+    return;
+  }
+  try {
+    verbergFout(melding);
+    await toonDossier(doc);
+  } catch (e) {
+    console.error(e);
+    toonFout(melding, 'Kon het dossier niet openen. Vernieuw de pagina en probeer opnieuw.');
+  }
 }
 
 export function initSearch() {
   const input = $('adres');
   const sug = $('sug');
   const melding = $('melding');
+
+  protocolCheck(melding);
 
   input.addEventListener('input', () => {
     clearTimeout(deb);
@@ -40,8 +89,10 @@ export function initSearch() {
 }
 
 async function suggereer(q, input, sug, melding) {
+  if (!protocolCheck(melding)) return;
   try {
     const r = await fetch(`${LS}/suggest?q=${encodeURIComponent(q)}&fq=type:adres&rows=7`);
+    if (!r.ok) throw new Error('pdok ' + r.status);
     const docs = (await r.json()).response?.docs || [];
     sug.innerHTML = '';
     docs.forEach(d => {
@@ -49,15 +100,21 @@ async function suggereer(q, input, sug, melding) {
       const b = document.createElement('button');
       b.type = 'button';
       b.innerHTML = `<span>${straat}</span><small>${rest}</small>`;
-      b.addEventListener('click', () => {
+      b.addEventListener('click', async () => {
         sug.style.display = 'none';
         input.value = d.weergavenaam;
-        openDossier(d.id).catch(() => netwerkFout(melding));
+        try {
+          let doc = await haalAdresOpId(d.id);
+          if (!doc) doc = await haalAdresOp(d.weergavenaam);
+          await openAdres(doc, melding);
+        } catch {
+          netwerkFout(melding);
+        }
       });
       sug.appendChild(b);
     });
     sug.style.display = docs.length ? 'block' : 'none';
-    melding.style.display = 'none';
+    verbergFout(melding);
   } catch {
     netwerkFout(melding);
   }
@@ -65,14 +122,10 @@ async function suggereer(q, input, sug, melding) {
 
 async function zoekDirect(q, melding) {
   if (q.length < 3) return;
+  if (!protocolCheck(melding)) return;
   try {
-    const r = await fetch(`${LS}/free?q=${encodeURIComponent(q)}&fq=type:adres&rows=1&fl=*`);
-    const doc = (await r.json()).response?.docs?.[0];
-    if (doc) toonDossier(doc);
-    else {
-      melding.style.display = 'block';
-      melding.textContent = 'Geen adres gevonden — probeer straat + huisnummer + plaats.';
-    }
+    const doc = await haalAdresOp(q);
+    await openAdres(doc, melding);
   } catch {
     netwerkFout(melding);
   }

@@ -30,7 +30,7 @@ export function resetDossierState() {
 }
 
 export function isDossierGeladen() {
-  return dossierState.klaar.bag || dossierState.klaar.woz;
+  return !!dossierState.adres;
 }
 
 export function adresSleutel() {

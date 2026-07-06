@@ -1,7 +1,6 @@
 import { WOZ, $ } from './config.js';
 import { fmtEur, padNa } from './utils.js';
 import { dossierState } from './state.js';
-import { updatePremiumUi } from './premium.js';
 
 function tekenSpark(w) {
   const svg = $('spark'), W = 380, H = 64, pad = 6;
@@ -32,7 +31,6 @@ export async function laadWoz(doc) {
     $('woz-status').className = isError ? 'status f' : 'status';
     $('woz-inhoud').style.display = 'none';
     dossierState.klaar.woz = true;
-    updatePremiumUi();
   };
   const loketLink = `<a href="https://www.wozwaardeloket.nl/" target="_blank" rel="noopener">WOZ-waardeloket</a>`;
   if (!naId) {
@@ -76,7 +74,6 @@ export async function laadWoz(doc) {
     $('woz-status').textContent = '';
     $('woz-inhoud').style.display = 'block';
     dossierState.klaar.woz = true;
-    updatePremiumUi();
   } catch {
     fallback(`Kon de WOZ-koppeling niet bereiken. Zoek dit adres direct op in het ${loketLink}.`);
   }

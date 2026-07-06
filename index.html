@@ -15,8 +15,11 @@
 <div id="map" aria-hidden="true"></div>
 
 <div class="top">
-  <div class="merk">Pand<i>dossier</i></div>
-  <div class="tag">Open data · Kadaster · BAG · WOZ</div>
+  <a href="./" class="merk">Pand<i>dossier</i></a>
+  <div class="top-rechts">
+    <a href="over.html" class="top-link">Over</a>
+    <div class="tag">Open data · Kadaster · BAG · WOZ</div>
+  </div>
 </div>
 
 <div class="stage" id="stage">
@@ -74,15 +77,23 @@
       <div class="bronnen" id="bronnen"></div>
     </div>
 
-    <div class="premium" id="premium-blok">
-      <h3>Download je Panddossier</h3>
-      <p class="premium-intro">Bewaar bouwjaar, WOZ-verloop en alle bronnen als PDF — handig bij bezichtiging of hypotheek.</p>
+    <div class="blok blok-premium" id="premium-blok">
+      <h3>PDF-dossier</h3>
+      <p class="status">Bewaar bouwjaar, WOZ-verloop en alle bronnen als PDF — handig bij bezichtiging of hypotheek.</p>
       <ul class="premium-lijst">
-        <li>Overzicht met bouwjaar, oppervlak & WOZ</li>
+        <li>Overzicht met bouwjaar, oppervlak &amp; WOZ</li>
         <li>WOZ-waardeverloop per peiljaar</li>
         <li>Alle officiële bronlinks op één pagina</li>
       </ul>
-      <button type="button" class="pdf-knop" id="pdf-koop" disabled>Download PDF (preview)</button>
+      <button type="button" class="pdf-knop" id="pdf-koop">
+        <span class="pdf-knop-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        </span>
+        <span class="pdf-knop-text">
+          <strong id="pdf-koop-titel">Download PDF</strong>
+          <small id="pdf-koop-sub">Gratis tijdens preview</small>
+        </span>
+      </button>
       <p class="pdf-hint" id="pdf-hint">Gratis tijdens preview — later € 4,95 per dossier.</p>
     </div>
 
@@ -91,13 +102,14 @@
       <p>Open data vertelt niet alles. Een bouwkundige keuring wél. <a href="#" rel="sponsored">Vergelijk keurders →</a></p>
     </div>
   </div>
-  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="av.html">Voorwaarden</a> · <a href="privacy.html">Privacy</a></div>
+  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="over.html">Over</a> · <a href="av.html">Voorwaarden</a> · <a href="privacy.html">Privacy</a></div>
 </aside>
 
 <div class="modal" id="premium-modal" role="dialog" aria-labelledby="premium-titel" aria-modal="true">
   <div class="modal-inhoud">
     <button type="button" class="modal-sluit" id="premium-sluit" aria-label="Sluiten">✕</button>
-    <h3 id="premium-titel">Panddossier PDF</h3>
+    <div class="eyebrow">PDF-dossier</div>
+    <h3 class="modal-titel" id="premium-titel">Panddossier PDF</h3>
     <p class="modal-adres" id="premium-adres">—</p>
     <ul class="premium-lijst">
       <li>Printbare PDF met alle dossiergegevens</li>

@@ -46,21 +46,27 @@ export function applyPendingUnlock() {
 
 export function updatePremiumUi() {
   const btn = $('pdf-koop');
+  const titel = $('pdf-koop-titel');
+  const sub = $('pdf-koop-sub');
   const hint = $('pdf-hint');
   if (!btn) return;
 
   const geladen = isDossierGeladen();
-  btn.disabled = !geladen;
+  btn.classList.toggle('is-disabled', !geladen);
+  btn.setAttribute('aria-disabled', geladen ? 'false' : 'true');
 
   if (PREMIUM.previewMode) {
-    btn.textContent = 'Download PDF (preview)';
-    if (hint) hint.textContent = 'Gratis tijdens preview — later € ' + PREMIUM.price + ' per dossier.';
+    if (titel) titel.textContent = 'Download PDF';
+    if (sub) sub.textContent = 'Gratis tijdens preview';
+    if (hint) hint.textContent = 'Later € ' + PREMIUM.price + ' per adres · nu gratis testen.';
   } else if (isUnlocked()) {
-    btn.textContent = 'Download PDF';
-    if (hint) hint.textContent = 'Betaald voor dit adres — download onbeperkt.';
+    if (titel) titel.textContent = 'Download PDF';
+    if (sub) sub.textContent = 'Betaald voor dit adres';
+    if (hint) hint.textContent = 'Onbeperkt opnieuw downloaden op dit apparaat.';
   } else {
-    btn.textContent = 'Bestel PDF — € ' + PREMIUM.price;
-    if (hint) hint.textContent = 'Eenmalig per adres · direct downloaden na betaling.';
+    if (titel) titel.textContent = 'Bestel PDF — € ' + PREMIUM.price;
+    if (sub) sub.textContent = 'Direct downloaden na betaling';
+    if (hint) hint.textContent = 'Eenmalig per adres.';
   }
 }
 
@@ -84,8 +90,11 @@ function startBetaling() {
   alert('Betaling nog niet geconfigureerd. Stel PREMIUM.paymentUrl in config.js in.');
 }
 
-function downloadPdf() {
-  if (!isDossierGeladen()) return;
+export function downloadPdf() {
+  if (!isDossierGeladen()) {
+    alert('Open eerst een adres om een PDF te downloaden.');
+    return;
+  }
   if (!PREMIUM.previewMode && !isUnlocked()) {
     openModal();
     return;
@@ -99,18 +108,18 @@ export function initPremium() {
   const prijsEl = document.querySelector('.modal-prijs strong');
   if (prijsEl) prijsEl.textContent = '€ ' + PREMIUM.price;
 
-  $('pdf-koop')?.addEventListener('click', downloadPdf);
+  $('pdf-koop')?.addEventListener('click', e => {
+    if (e.currentTarget.classList.contains('is-disabled')) return;
+    e.preventDefault();
+    downloadPdf();
+  });
+
   $('premium-sluit')?.addEventListener('click', sluitModal);
   $('premium-modal')?.addEventListener('click', e => {
     if (e.target === $('premium-modal')) sluitModal();
   });
   $('premium-betaal')?.addEventListener('click', () => {
-    if (PREMIUM.previewMode) {
-      genereerPdf();
-      sluitModal();
-      return;
-    }
-    if (isUnlocked()) {
+    if (PREMIUM.previewMode || isUnlocked()) {
       genereerPdf();
       sluitModal();
       return;
@@ -121,7 +130,6 @@ export function initPremium() {
   updatePremiumUi();
 }
 
-/** Na succesvolle betaling (redirect) of handmatige unlock. */
 export function markeerBetaald() {
   unlockHuidigAdres();
   updatePremiumUi();
