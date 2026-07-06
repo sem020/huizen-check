@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panddossier — alle open data over één adres</title>
+<meta name="description" content="Vul een adres in en zie direct bouwjaar, oppervlakte, WOZ-waarde en alle officiële open bronnen over dat pand.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="map" aria-hidden="true"></div>
+
+<div class="top">
+  <div class="merk">Pand<i>dossier</i></div>
+  <div class="tag">Open data · Kadaster · BAG · WOZ</div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="etalage">
+    <h1>Elk huis heeft een <i>openbaar dossier.</i></h1>
+    <p>Bouwjaar, woonoppervlak, WOZ-waarde en elf officiële bronnen — gratis in de browser. Download een PDF-dossier wanneer je het nodig hebt.</p>
+    <div class="zoek">
+      <input id="adres" type="text" autocomplete="off" spellcheck="false" enterkeyhint="search"
+             placeholder="Zoek een adres, bv. Herengracht 123 Amsterdam" aria-label="Zoek een adres">
+      <span class="lens">⌕</span>
+      <div class="sug" id="sug" role="listbox"></div>
+    </div>
+    <div class="voorbeelden" id="voorbeelden">
+      <button type="button">Herengracht 123 Amsterdam</button>
+      <button type="button">Elandsgracht 84 Amsterdam</button>
+      <button type="button">Kerkstraat 12 Utrecht</button>
+    </div>
+    <div class="melding" id="melding"></div>
+  </div>
+  <div class="kaart-ruimte" aria-hidden="true"></div>
+</div>
+
+<aside class="dossier" id="dossier" aria-live="polite">
+  <button class="sluit" id="sluit" aria-label="Dossier sluiten">✕</button>
+  <div class="d-scroll">
+    <div class="eyebrow">Panddossier</div>
+    <h2 class="d-adres" id="d-adres">—</h2>
+    <div class="d-plaats" id="d-plaats">—</div>
+
+    <div class="stats">
+      <div class="stat"><div class="n skelet" id="s-bouwjaar">0000</div><div class="l">Bouwjaar</div></div>
+      <div class="stat"><div class="n skelet" id="s-opp">000 m²</div><div class="l">Oppervlak</div></div>
+      <div class="stat"><div class="n skelet" id="s-woz">€ 000k</div><div class="l">WOZ</div></div>
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <div class="blok">
+      <h3>WOZ-waardeverloop</h3>
+      <div class="status" id="woz-status">Waarden ophalen…</div>
+      <div id="woz-inhoud" style="display:none">
+        <div class="woz-rij">
+          <div class="woz-n" id="woz-bedrag">—<small id="woz-peil"></small></div>
+          <div class="woz-delta" id="woz-delta"></div>
+        </div>
+        <svg id="spark" viewBox="0 0 380 64" preserveAspectRatio="none" role="img" aria-label="WOZ-waarde per jaar">
+          <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(13,148,136,.22)"/><stop offset="1" stop-color="rgba(13,148,136,0)"/>
+          </linearGradient></defs>
+        </svg>
+      </div>
+    </div>
+
+    <div class="blok">
+      <h3>Officiële bronnen voor dit adres</h3>
+      <div class="bronnen" id="bronnen"></div>
+    </div>
+
+    <div class="premium" id="premium-blok">
+      <h3>Download je Panddossier</h3>
+      <p class="premium-intro">Bewaar bouwjaar, WOZ-verloop en alle bronnen als PDF — handig bij bezichtiging of hypotheek.</p>
+      <ul class="premium-lijst">
+        <li>Overzicht met bouwjaar, oppervlak & WOZ</li>
+        <li>WOZ-waardeverloop per peiljaar</li>
+        <li>Alle officiële bronlinks op één pagina</li>
+      </ul>
+      <button type="button" class="pdf-knop" id="pdf-koop" disabled>Download PDF (preview)</button>
+      <p class="pdf-hint" id="pdf-hint">Gratis tijdens preview — later € 4,95 per dossier.</p>
+    </div>
+
+    <div class="advies">
+      <h3>Dit huis serieus op het oog?</h3>
+      <p>Open data vertelt niet alles. Een bouwkundige keuring wél. <a href="#" rel="sponsored">Vergelijk keurders →</a></p>
+    </div>
+  </div>
+  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="av.html">Voorwaarden</a> · <a href="privacy.html">Privacy</a></div>
+</aside>
+
+<div class="modal" id="premium-modal" role="dialog" aria-labelledby="premium-titel" aria-modal="true">
+  <div class="modal-inhoud">
+    <button type="button" class="modal-sluit" id="premium-sluit" aria-label="Sluiten">✕</button>
+    <h3 id="premium-titel">Panddossier PDF</h3>
+    <p class="modal-adres" id="premium-adres">—</p>
+    <ul class="premium-lijst">
+      <li>Printbare PDF met alle dossiergegevens</li>
+      <li>Geldig voor dit adres — onbeperkt opnieuw downloaden</li>
+    </ul>
+    <p class="modal-prijs">Eenmalig <strong>€ 4,95</strong></p>
+    <button type="button" class="pdf-knop" id="premium-betaal">Betaal &amp; download</button>
+    <p class="modal-klein">Na betaling kun je direct downloaden. Geen account nodig.</p>
+  </div>
+</div>
+
+<button class="herzoek" id="herzoek">⌕ &nbsp;Nieuw adres</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
