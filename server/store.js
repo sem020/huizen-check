@@ -1,15 +1,11 @@
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
+import { DATA_DIR } from './paths.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const dataDir = join(__dirname, '..', 'data');
-const ordersFile = join(dataDir, 'orders.json');
-const pdfDir = join(dataDir, 'pdfs');
+const ordersFile = join(DATA_DIR, 'orders.json');
+const pdfDir = join(DATA_DIR, 'pdfs');
 
-mkdirSync(dataDir, { recursive: true });
 mkdirSync(pdfDir, { recursive: true });
-
 if (!existsSync(ordersFile)) writeFileSync(ordersFile, '{}');
 
 function readAll() {

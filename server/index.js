@@ -221,25 +221,31 @@ app.use(express.static(root, {
   },
 }));
 
-const server = app.listen(config.port, config.host, () => {
-  console.log('');
-  console.log(`Pandloket server → ${config.publicUrl}`);
-  console.log(`  listen:   ${config.host}:${config.port}`);
-  console.log(`  betaling: ${config.paymentMode}`);
-  console.log(`  prijs:    € ${priceLabel()}`);
-  console.log(`  e-mail:   ${config.resendApiKey ? 'Resend' : 'mock (console)'}`);
-  console.log(`  EP-Online:${config.epOnlineApiKey ? ' geconfigureerd' : ' geen key'}`);
-  console.log('');
-  if (config.paymentMode === 'mock') {
-    console.log('  Tip: open de site, zoek een adres, bestel PDF.');
-    console.log('  Mock-betaling vraagt geen Mollie-account.');
+// Eerst proberen op HOST (default 0.0.0.0); bij EADDRNOTAVAIL zonder host.
+function startListening(host) {
+  const args = host ? [config.port, host] : [config.port];
+  const server = app.listen(...args, () => {
     console.log('');
-  }
-  // Uitstellen: GTFS-download bij start kan Hostinger shared plans OOM'en → 503.
-  setTimeout(() => warmOvCache(), 15_000);
-});
+    console.log(`Pandloket server → ${config.publicUrl}`);
+    console.log(`  listen:   ${host || 'default'}:${config.port}`);
+    console.log(`  betaling: ${config.paymentMode}`);
+    console.log(`  prijs:    € ${priceLabel()}`);
+    console.log(`  e-mail:   ${config.resendApiKey ? 'Resend' : 'mock (console)'}`);
+    console.log(`  EP-Online:${config.epOnlineApiKey ? ' geconfigureerd' : ' geen key'}`);
+    console.log('');
+    // Uitstellen: GTFS-download bij start kan shared plans OOM'en → 503.
+    setTimeout(() => warmOvCache(), 30_000);
+  });
 
-server.on('error', (err) => {
-  console.error('Server start mislukt:', err);
-  process.exit(1);
-});
+  server.on('error', (err) => {
+    if (host && (err.code === 'EADDRNOTAVAIL' || err.code === 'EINVAL')) {
+      console.warn(`Listen op ${host} mislukt (${err.code}), opnieuw zonder host…`);
+      startListening(null);
+      return;
+    }
+    console.error('Server start mislukt:', err);
+    process.exit(1);
+  });
+}
+
+startListening(config.host);

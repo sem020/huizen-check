@@ -1,2 +1,2 @@
-/** Hostinger / PaaS entry — start Express (server/index.js). */
-import './server/index.js';
+/** @deprecated use app.js — kept for Hostinger/index fallbacks */
+import './app.js';

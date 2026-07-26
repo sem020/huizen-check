@@ -3,16 +3,14 @@
  * Bron: https://gtfs.ovapi.nl/ — Bus/Tram/Metro/Trein.
  */
 import { createWriteStream, existsSync, mkdirSync, readFileSync, statSync, writeFileSync, unlinkSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 import { pipeline } from 'stream/promises';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { tmpdir } from 'os';
+import { DATA_DIR } from './paths.js';
 
 const execFileAsync = promisify(execFile);
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, '..', 'data');
 const STOPS_PATH = join(DATA_DIR, 'stops.txt');
 const META_PATH = join(DATA_DIR, 'ov-meta.json');
 
