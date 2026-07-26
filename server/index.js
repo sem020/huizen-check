@@ -221,9 +221,10 @@ app.use(express.static(root, {
   },
 }));
 
-app.listen(config.port, () => {
+const server = app.listen(config.port, config.host, () => {
   console.log('');
   console.log(`Pandloket server → ${config.publicUrl}`);
+  console.log(`  listen:   ${config.host}:${config.port}`);
   console.log(`  betaling: ${config.paymentMode}`);
   console.log(`  prijs:    € ${priceLabel()}`);
   console.log(`  e-mail:   ${config.resendApiKey ? 'Resend' : 'mock (console)'}`);
@@ -235,4 +236,9 @@ app.listen(config.port, () => {
     console.log('');
   }
   warmOvCache();
+});
+
+server.on('error', (err) => {
+  console.error('Server start mislukt:', err);
+  process.exit(1);
 });
