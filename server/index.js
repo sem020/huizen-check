@@ -235,7 +235,8 @@ const server = app.listen(config.port, config.host, () => {
     console.log('  Mock-betaling vraagt geen Mollie-account.');
     console.log('');
   }
-  warmOvCache();
+  // Uitstellen: GTFS-download bij start kan Hostinger shared plans OOM'en → 503.
+  setTimeout(() => warmOvCache(), 15_000);
 });
 
 server.on('error', (err) => {

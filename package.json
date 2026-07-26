@@ -4,9 +4,9 @@
   "private": true,
   "description": "Pandloket — open data woningdossier met betaalde PDF-export",
   "type": "module",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node app.js",
     "dev": "node --watch server/index.js"
   },
   "engines": {

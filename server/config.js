@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-dotenv.config({ override: true });
+// Geen override: Hostinger/panel-env vars winnen van een eventuele .env.
+dotenv.config();
 
 const mode = (process.env.PAYMENT_MODE || 'mock').toLowerCase();
 
