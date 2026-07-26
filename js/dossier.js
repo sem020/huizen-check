@@ -3,7 +3,11 @@ import { splitsNaam, parsePoint } from './utils.js';
 import { toonLocatie, resetKaart } from './map.js';
 import { laadBag } from './bag.js';
 import { laadWoz } from './woz.js';
-import { vulBronnen } from './bronnen.js';
+import { laadEnergielabel } from './energielabel.js';
+import { laadMonumenten } from './monumenten.js';
+import { laadCbs } from './cbs.js';
+import { laadNabijheid } from './nabijheid.js';
+import { laadOv } from './ov.js';
 import { resetDossierState, dossierState } from './state.js';
 import { applyPendingUnlock, updatePremiumUi } from './premium.js';
 
@@ -27,12 +31,41 @@ export async function toonDossier(doc) {
   $('woz-status').textContent = 'Waarden ophalen…';
   $('woz-status').className = 'status';
   $('woz-inhoud').style.display = 'none';
+  if ($('el-status')) {
+    $('el-status').textContent = 'Energielabel ophalen…';
+    $('el-status').className = 'status';
+  }
+  if ($('el-inhoud')) $('el-inhoud').style.display = 'none';
+  if ($('mon-status')) {
+    $('mon-status').textContent = 'Monumentenstatus ophalen…';
+    $('mon-status').className = 'status';
+  }
+  if ($('mon-inhoud')) $('mon-inhoud').style.display = 'none';
+  if ($('cbs-status')) {
+    $('cbs-status').textContent = 'Buurtcijfers ophalen…';
+    $('cbs-status').className = 'status';
+  }
+  if ($('cbs-inhoud')) $('cbs-inhoud').style.display = 'none';
+  if ($('nabij-status')) {
+    $('nabij-status').textContent = 'Nabijheid ophalen…';
+    $('nabij-status').className = 'status';
+  }
+  if ($('nabij-inhoud')) $('nabij-inhoud').style.display = 'none';
+  if ($('ov-status')) {
+    $('ov-status').textContent = 'OV-halten ophalen…';
+    $('ov-status').className = 'status';
+  }
+  if ($('ov-inhoud')) $('ov-inhoud').style.display = 'none';
 
   const [lon, lat] = parsePoint(doc.centroide_ll);
   toonLocatie(lat, lon);
-  vulBronnen(doc, lat, lon);
   laadBag(doc);
   laadWoz(doc);
+  laadEnergielabel(doc);
+  laadMonumenten(lat, lon);
+  laadCbs(doc);
+  laadNabijheid(doc, lat, lon);
+  laadOv(lat, lon);
 
   applyPendingUnlock();
   updatePremiumUi();

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bedankt — Pandloket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/static.css">
+<style>
+  .status-box{
+    background:#fff;border-radius:16px;padding:28px 24px;margin-top:20px;
+    box-shadow:0 8px 32px rgba(15,23,42,.08);
+  }
+  .ok{color:#059669;font-weight:800}
+  .wacht{color:#0d9488;font-weight:700}
+  .fout{color:#dc2626}
+  .dl{
+    display:inline-block;margin-top:16px;padding:12px 18px;border-radius:12px;
+    background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff!important;
+    font-weight:800;text-decoration:none!important;
+  }
+  .dl:hover{text-decoration:none!important;opacity:.95}
+</style>
+</head>
+<body class="static-pagina">
+
+<header class="static-top">
+  <a href="./" class="static-merk">Pand<i>loket</i></a>
+  <nav class="static-nav">
+    <a href="./" class="static-nav-link">Zoeken</a>
+    <a href="over.html" class="static-nav-link">Over</a>
+  </nav>
+</header>
+
+<main class="static-inhoud">
+  <h1>Bedankt voor je bestelling</h1>
+  <p class="intro" id="intro">We controleren je betaling…</p>
+
+  <div class="status-box" id="box">
+    <p class="wacht" id="status">Bezig met controleren…</p>
+    <p id="detail" style="margin-top:8px"></p>
+    <div id="acties"></div>
+  </div>
+</main>
+
+<script>
+const orderId = new URLSearchParams(location.search).get('order');
+const statusEl = document.getElementById('status');
+const detailEl = document.getElementById('detail');
+const actiesEl = document.getElementById('acties');
+const introEl = document.getElementById('intro');
+
+if (!orderId) {
+  statusEl.className = 'fout';
+  statusEl.textContent = 'Geen order-id in de URL.';
+} else {
+  poll();
+}
+
+async function poll(poging = 0) {
+  try {
+    const r = await fetch('/api/orders/' + encodeURIComponent(orderId));
+    const o = await r.json();
+    if (!r.ok) throw new Error(o.error || 'Niet gevonden');
+
+    if (o.status === 'paid') {
+      statusEl.className = 'ok';
+      statusEl.textContent = 'Betaling ontvangen';
+      introEl.textContent = 'Je Pandloket is klaar.';
+      detailEl.textContent = (o.adres || '') + (o.plaats ? ', ' + o.plaats : '') +
+        (o.email ? ' · verzonden naar ' + o.email : '');
+      actiesEl.innerHTML = o.pdfReady
+        ? `<a class="dl" href="/api/orders/${encodeURIComponent(orderId)}/pdf">Download PDF</a>
+           <p style="margin-top:14px;font-size:.84rem;color:#64748b">In mock-modus staat de e-mail in de server-terminal. Met Resend komt hij in je inbox.</p>`
+        : `<p style="margin-top:12px;color:#64748b">PDF wordt aangemaakt…</p>`;
+      if (!o.pdfReady && poging < 20) setTimeout(() => poll(poging + 1), 1000);
+      try {
+        const unlock = JSON.parse(localStorage.getItem('pandloket_unlock') || '{}');
+        const key = ((o.adres || '') + '|' + (o.plaats || '')).toLowerCase().replace(/[^a-z0-9|]/g, '');
+        if (key) {
+          unlock[key] = Date.now();
+          localStorage.setItem('pandloket_unlock', JSON.stringify(unlock));
+        }
+      } catch {}
+      return;
+    }
+
+    if (['failed', 'canceled', 'expired'].includes(o.status)) {
+      statusEl.className = 'fout';
+      statusEl.textContent = 'Betaling niet gelukt (' + o.status + ')';
+      actiesEl.innerHTML = '<p style="margin-top:12px"><a href="./">Opnieuw proberen</a></p>';
+      return;
+    }
+
+    statusEl.className = 'wacht';
+    statusEl.textContent = 'Wachten op betaling…';
+    detailEl.textContent = 'Status: ' + o.status;
+    if (poging < 40) setTimeout(() => poll(poging + 1), 1500);
+  } catch (e) {
+    statusEl.className = 'fout';
+    statusEl.textContent = e.message;
+  }
+}
+</script>
+</body>
+</html>

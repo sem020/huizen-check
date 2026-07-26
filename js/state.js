@@ -11,6 +11,11 @@ export const dossierState = {
   chips: [],
   wozRijen: [],
   bronnen: [],
+  energielabel: null,
+  monumenten: null,
+  cbs: null,
+  nabijheid: null,
+  ov: null,
   klaar: { bag: false, woz: false },
 };
 
@@ -26,6 +31,11 @@ export function resetDossierState() {
   dossierState.chips = [];
   dossierState.wozRijen = [];
   dossierState.bronnen = [];
+  dossierState.energielabel = null;
+  dossierState.monumenten = null;
+  dossierState.cbs = null;
+  dossierState.nabijheid = null;
+  dossierState.ov = null;
   dossierState.klaar = { bag: false, woz: false };
 }
 

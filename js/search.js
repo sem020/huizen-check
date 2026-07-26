@@ -16,14 +16,14 @@ function verbergFout(melding) {
 
 function netwerkFout(melding) {
   toonFout(melding,
-    `Geen verbinding met de PDOK-API. Open Panddossier via een <b>lokale server</b> of je hosting — niet als bestand op je computer (<code>file://</code>).`
+    `Geen verbinding met de PDOK-API. Open Pandloket via een <b>lokale server</b> of je hosting — niet als bestand op je computer (<code>file://</code>).`
   );
 }
 
 function protocolCheck(melding) {
   if (location.protocol === 'file:') {
     toonFout(melding,
-      'Panddossier werkt niet als los bestand. Start een lokale server: <code>python3 -m http.server 8000</code> en open <code>http://localhost:8000</code>.'
+      'Pandloket werkt niet als los bestand. Start een lokale server: <code>python3 -m http.server 8000</code> en open <code>http://localhost:8000</code>.'
     );
     return false;
   }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panddossier — alle open data over één adres</title>
+<title>Pandloket — alle open data over één adres</title>
 <meta name="description" content="Vul een adres in en zie direct bouwjaar, oppervlakte, WOZ-waarde en alle officiële open bronnen over dat pand.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
 <div id="map" aria-hidden="true"></div>
 
 <div class="top">
-  <a href="./" class="merk">Pand<i>dossier</i></a>
+  <a href="./" class="merk">Pand<i>loket</i></a>
   <div class="top-rechts">
     <a href="over.html" class="top-link">Over</a>
     <div class="tag">Open data · Kadaster · BAG · WOZ</div>
@@ -24,8 +24,8 @@
 
 <div class="stage" id="stage">
   <div class="etalage">
-    <h1>Elk huis heeft een <i>openbaar dossier.</i></h1>
-    <p>Bouwjaar, woonoppervlak, WOZ-waarde en elf officiële bronnen — gratis in de browser. Download een PDF-dossier wanneer je het nodig hebt.</p>
+    <h1>Elk huis heeft een <i>openbaar loket.</i></h1>
+    <p>Bouwjaar, woonoppervlak, WOZ-waarde en meer open data — gratis in de browser.</p>
     <div class="zoek">
       <input id="adres" type="text" autocomplete="off" spellcheck="false" enterkeyhint="search"
              placeholder="Zoek een adres, bv. Herengracht 123 Amsterdam" aria-label="Zoek een adres">
@@ -45,7 +45,7 @@
 <aside class="dossier" id="dossier" aria-live="polite">
   <button class="sluit" id="sluit" aria-label="Dossier sluiten">✕</button>
   <div class="d-scroll">
-    <div class="eyebrow">Panddossier</div>
+    <div class="eyebrow">Pandloket</div>
     <h2 class="d-adres" id="d-adres">—</h2>
     <div class="d-plaats" id="d-plaats">—</div>
 
@@ -56,45 +56,99 @@
     </div>
     <div class="chips" id="chips"></div>
 
+    <div class="blok" id="el-blok">
+      <h3>Energielabel</h3>
+      <div class="status" id="el-status">Energielabel ophalen…</div>
+      <div class="el-inhoud" id="el-inhoud" style="display:none">
+        <div class="el-badge el-onbekend" id="el-badge">—</div>
+        <div class="el-tekst">
+          <div class="el-titel">Geregistreerd label</div>
+          <div class="el-meta" id="el-meta"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="blok">
       <h3>WOZ-waardeverloop</h3>
       <div class="status" id="woz-status">Waarden ophalen…</div>
       <div id="woz-inhoud" style="display:none">
         <div class="woz-rij">
-          <div class="woz-n" id="woz-bedrag">—<small id="woz-peil"></small></div>
+          <div class="woz-n">
+            <span id="woz-bedrag">—</span>
+            <small id="woz-peil"></small>
+          </div>
           <div class="woz-delta" id="woz-delta"></div>
         </div>
-        <svg id="spark" viewBox="0 0 380 64" preserveAspectRatio="none" role="img" aria-label="WOZ-waarde per jaar">
-          <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="rgba(13,148,136,.22)"/><stop offset="1" stop-color="rgba(13,148,136,0)"/>
-          </linearGradient></defs>
-        </svg>
+        <div class="woz-spark" id="woz-spark" role="slider" aria-label="WOZ-waarde per peiljaar" aria-valuemin="" aria-valuemax="" aria-valuenow="" tabindex="0">
+          <svg id="spark" viewBox="0 0 380 72" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(13,148,136,.22)"/><stop offset="1" stop-color="rgba(13,148,136,0)"/>
+            </linearGradient></defs>
+          </svg>
+          <div class="woz-hint" id="woz-hint">Beweeg over de lijn om peiljaren te bekijken</div>
+        </div>
       </div>
     </div>
 
-    <div class="blok">
-      <h3>Officiële bronnen voor dit adres</h3>
-      <div class="bronnen" id="bronnen"></div>
+    <div class="blok" id="mon-blok">
+      <h3>Monumenten</h3>
+      <div class="status" id="mon-status">Monumentenstatus ophalen…</div>
+      <div class="mon-inhoud" id="mon-inhoud" style="display:none">
+        <div class="mon-top">
+          <div class="mon-badge mon-nee" id="mon-badge">—</div>
+          <div class="mon-tekst">
+            <div class="mon-titel" id="mon-titel">—</div>
+            <div class="mon-meta" id="mon-meta"></div>
+          </div>
+        </div>
+        <div class="mon-lijst" id="mon-lijst"></div>
+      </div>
     </div>
 
-    <div class="blok blok-premium" id="premium-blok">
+    <div class="blok" id="cbs-blok">
+      <h3>Buurt (CBS)</h3>
+      <div class="status" id="cbs-status">Buurtcijfers ophalen…</div>
+      <div class="cbs-inhoud" id="cbs-inhoud" style="display:none">
+        <div class="cbs-naam" id="cbs-naam">—</div>
+        <div class="cbs-grid" id="cbs-grid"></div>
+      </div>
+    </div>
+
+    <div class="blok" id="nabij-blok">
+      <h3>Nabijheid (CBS)</h3>
+      <div class="status" id="nabij-status">Nabijheid ophalen…</div>
+      <div class="cbs-inhoud" id="nabij-inhoud" style="display:none">
+        <div class="cbs-naam" id="nabij-naam">—</div>
+        <div class="cbs-grid" id="nabij-grid"></div>
+      </div>
+    </div>
+
+    <div class="blok" id="ov-blok">
+      <h3>Dichtstbijzijnde OV</h3>
+      <div class="status" id="ov-status">OV-halten ophalen…</div>
+      <div class="ov-inhoud" id="ov-inhoud" style="display:none">
+        <div class="ov-lijst" id="ov-lijst"></div>
+      </div>
+    </div>
+
+    <div class="blok blok-premium" id="premium-blok" hidden>
       <h3>PDF-dossier</h3>
-      <p class="status">Bewaar bouwjaar, WOZ-verloop en alle bronnen als PDF — handig bij bezichtiging of hypotheek.</p>
+      <p class="status">Bewaar bouwjaar, WOZ-verloop en dossiergegevens als PDF — handig bij bezichtiging of hypotheek.</p>
       <ul class="premium-lijst">
         <li>Overzicht met bouwjaar, oppervlak &amp; WOZ</li>
         <li>WOZ-waardeverloop per peiljaar</li>
-        <li>Alle officiële bronlinks op één pagina</li>
+        <li>Energielabel, buurtcijfers &amp; nabijheid</li>
       </ul>
       <button type="button" class="pdf-knop" id="pdf-koop">
         <span class="pdf-knop-icon" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
         </span>
         <span class="pdf-knop-text">
-          <strong id="pdf-koop-titel">Download PDF</strong>
-          <small id="pdf-koop-sub">Gratis tijdens preview</small>
+          <strong id="pdf-koop-titel">Bestel PDF — € 4,95</strong>
+          <small id="pdf-koop-sub">Betalen · PDF per e-mail + download</small>
         </span>
       </button>
-      <p class="pdf-hint" id="pdf-hint">Gratis tijdens preview — later € 4,95 per dossier.</p>
+      <p class="pdf-hint" id="pdf-hint">Eenmalig per adres · mock of Mollie-test.</p>
     </div>
 
     <div class="advies">
@@ -102,22 +156,26 @@
       <p>Open data vertelt niet alles. Een bouwkundige keuring wél. <a href="#" rel="sponsored">Vergelijk keurders →</a></p>
     </div>
   </div>
-  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="over.html">Over</a> · <a href="av.html">Voorwaarden</a> · <a href="privacy.html">Privacy</a></div>
+  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer, CBS, EP-Online). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="over.html">Bronnen &amp; over</a> · <a href="av.html">Voorwaarden</a> · <a href="privacy.html">Privacy</a></div>
 </aside>
 
-<div class="modal" id="premium-modal" role="dialog" aria-labelledby="premium-titel" aria-modal="true">
+<div class="modal" id="premium-modal" role="dialog" aria-labelledby="premium-titel" aria-modal="true" hidden>
   <div class="modal-inhoud">
     <button type="button" class="modal-sluit" id="premium-sluit" aria-label="Sluiten">✕</button>
     <div class="eyebrow">PDF-dossier</div>
-    <h3 class="modal-titel" id="premium-titel">Panddossier PDF</h3>
+    <h3 class="modal-titel" id="premium-titel">Pandloket PDF</h3>
     <p class="modal-adres" id="premium-adres">—</p>
     <ul class="premium-lijst">
-      <li>Printbare PDF met alle dossiergegevens</li>
-      <li>Geldig voor dit adres — onbeperkt opnieuw downloaden</li>
+      <li>PDF met bouwjaar, oppervlak &amp; WOZ-verloop</li>
+      <li>Direct downloaden + per e-mail ontvangen</li>
     </ul>
     <p class="modal-prijs">Eenmalig <strong>€ 4,95</strong></p>
+    <label class="modal-label" for="premium-email">E-mailadres voor je rapport</label>
+    <input class="modal-input" id="premium-email" type="email" autocomplete="email"
+           placeholder="jij@email.nl" required>
+    <p class="modal-fout" id="premium-fout" hidden></p>
     <button type="button" class="pdf-knop" id="premium-betaal">Betaal &amp; download</button>
-    <p class="modal-klein">Na betaling kun je direct downloaden. Geen account nodig.</p>
+    <p class="modal-klein">Testmodus: geen echt geld. Later Mollie test/live via .env.</p>
   </div>
 </div>
 

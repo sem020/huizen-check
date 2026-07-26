@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testbetaling — Pandloket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/static.css">
+<style>
+  .pay-card{
+    background:#fff;border-radius:16px;padding:28px 24px;
+    box-shadow:0 8px 32px rgba(15,23,42,.08);margin-top:24px;
+  }
+  .badge{
+    display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:#0d9488;background:#ccfbf1;
+    padding:5px 10px;border-radius:100px;margin-bottom:12px;
+  }
+  .pay-adres{font-size:1.2rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+  .pay-meta{color:#64748b;font-size:.84rem;margin-bottom:20px}
+  .pay-btn{
+    display:block;width:100%;padding:14px 18px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;
+    font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer;
+  }
+  .pay-btn:disabled{opacity:.5;cursor:wait}
+  .pay-fout{color:#dc2626;font-size:.84rem;margin-top:12px;display:none}
+</style>
+</head>
+<body class="static-pagina">
+
+<header class="static-top">
+  <a href="./" class="static-merk">Pand<i>loket</i></a>
+  <nav class="static-nav">
+    <a href="./" class="static-nav-link">Zoeken</a>
+  </nav>
+</header>
+
+<main class="static-inhoud">
+  <span class="badge">Mock-betaling · geen echt geld</span>
+  <h1>Simuleer betaling</h1>
+  <p class="intro">Je zit in testmodus zonder Mollie-account. Klik hieronder om een geslaagde betaling na te bootsen.</p>
+
+  <div class="pay-card">
+    <div class="pay-adres" id="adres">Laden…</div>
+    <div class="pay-meta" id="meta"></div>
+    <button type="button" class="pay-btn" id="betaal">Betaal (test) &amp; ontvang PDF</button>
+    <p class="pay-fout" id="fout"></p>
+  </div>
+</main>
+
+<script>
+const params = new URLSearchParams(location.search);
+const orderId = params.get('order');
+const adresEl = document.getElementById('adres');
+const metaEl = document.getElementById('meta');
+const btn = document.getElementById('betaal');
+const fout = document.getElementById('fout');
+
+if (!orderId) {
+  adresEl.textContent = 'Geen order gevonden';
+  btn.disabled = true;
+} else {
+  fetch('/api/orders/' + encodeURIComponent(orderId))
+    .then(r => r.json())
+    .then(o => {
+      if (o.error) throw new Error(o.error);
+      adresEl.textContent = (o.adres || 'Adres') + (o.plaats ? ', ' + o.plaats : '');
+      metaEl.textContent = o.email + ' · status: ' + o.status;
+      if (o.status === 'paid') {
+        location.replace('/bedankt.html?order=' + encodeURIComponent(orderId));
+      }
+    })
+    .catch(e => {
+      adresEl.textContent = 'Order niet gevonden';
+      fout.style.display = 'block';
+      fout.textContent = e.message;
+      btn.disabled = true;
+    });
+}
+
+btn.addEventListener('click', async () => {
+  btn.disabled = true;
+  btn.textContent = 'Bezig…';
+  fout.style.display = 'none';
+  try {
+    const r = await fetch('/api/mock-pay/' + encodeURIComponent(orderId), { method: 'POST' });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'Mislukt');
+    location.href = j.redirectUrl;
+  } catch (e) {
+    fout.style.display = 'block';
+    fout.textContent = e.message;
+    btn.disabled = false;
+    btn.textContent = 'Betaal (test) & ontvang PDF';
+  }
+});
+</script>
+</body>
+</html>
