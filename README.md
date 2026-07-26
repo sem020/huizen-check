@@ -33,12 +33,12 @@ Open **http://localhost:3000**
 
 ### Optie B — Hostinger Node (Express)
 
-- Entry file: `app.js`
+- Entry file: `server/index.js`
+- Start command / package.json: `npm start` → `node server/index.js`
 - Output directory: leeg
 - Env: `PORT=3000`, `PUBLIC_URL=https://pandloket.nl`, `PAYMENT_MODE=mock`
 - Na deploy: Restart, test `/api/health`
 - Lokaal altijd met `npm start`, niet Python
-
 ## Betalingsmodi
 
 In `.env` (zie `.env.example`):

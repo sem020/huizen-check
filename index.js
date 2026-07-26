@@ -1,2 +1,2 @@
-/** @deprecated use app.js — kept for Hostinger/index fallbacks */
-import './app.js';
+/** Fallback entry — prefer server/index.js on Hostinger. */
+import './server/index.js';
