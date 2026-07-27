@@ -27,6 +27,11 @@ function initMap() {
     zoomAnimation: false,
     fadeAnimation: true,
     markerZoomAnimation: false,
+    // Minder gevoelige scroll/pinch-zoom
+    zoomSnap: 0.25,
+    zoomDelta: 0.5,
+    wheelPxPerZoomLevel: 160,
+    wheelDebounceTime: 45,
   });
   L.control.zoom({ position: 'bottomleft' }).addTo(map);
 

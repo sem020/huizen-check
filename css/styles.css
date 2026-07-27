@@ -55,14 +55,14 @@ html[data-theme="dark"]{
   --shadow:0 4px 24px rgba(0,0,0,.35);
   --shadow-lg:0 16px 48px rgba(0,0,0,.45);
   --shadow-float:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.25);
-  --map-bg:#0B1220;
+  --map-bg:#1a2740;
   --surface:rgba(30,41,59,.72);
   --surface-strong:rgba(30,41,59,.88);
   --input-bg:rgba(30,41,59,.75);
   --input-focus:rgba(30,41,59,.95);
   --chip-bg:rgba(30,41,59,.8);
   --hover-lift:rgba(30,41,59,.98);
-  --map-veil:linear-gradient(90deg, rgba(11,18,32,.55) 0%, transparent 44%);
+  --map-veil:linear-gradient(90deg, rgba(15,23,42,.38) 0%, transparent 48%);
   --premium-bg:linear-gradient(160deg, rgba(45,212,191,.12) 0%, rgba(30,41,59,.85) 100%);
   --modal-scrim:rgba(0,0,0,.55);
   --modal-bg:#111827;
@@ -96,7 +96,15 @@ body{
 }
 .leaflet-tile{filter:none}
 html[data-theme="dark"] .leaflet-tile{
-  filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.92) saturate(.85);
+  /* Lichtere, warmere dark map i.p.v. zware invert */
+  filter: invert(.88) hue-rotate(180deg) brightness(1.28) contrast(.82) saturate(.55);
+}
+html[data-theme="dark"] #map::before{
+  content:"";
+  position:absolute;inset:0;z-index:350;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 45%, rgba(45,212,191,.07), transparent 55%),
+    linear-gradient(180deg, rgba(15,23,42,.12), transparent 35%, rgba(15,23,42,.18));
 }
 .leaflet-control-attribution{
   background:var(--glass-strong)!important;color:var(--muted)!important;
