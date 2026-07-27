@@ -10,12 +10,14 @@ import { laadNabijheid } from './nabijheid.js';
 import { laadOv } from './ov.js';
 import { resetDossierState, dossierState } from './state.js';
 import { applyPendingUnlock, updatePremiumUi } from './premium.js';
+import { zetShareUrl, wisShareUrl } from './share.js';
 
 export async function toonDossier(doc) {
   if (!doc?.weergavenaam) throw new Error('ongeldig adres');
 
   resetDossierState();
   dossierState.doc = doc;
+  zetShareUrl(doc);
 
   $('stage').classList.add('weg');
   $('dossier').classList.add('open');
@@ -82,6 +84,7 @@ export function sluitDossier(input) {
   $('stage').classList.remove('weg');
   resetKaart();
   resetDossierState();
+  wisShareUrl();
   updatePremiumUi();
   input.focus();
   input.select();

@@ -120,7 +120,7 @@ async function suggereer(q, input, sug, melding) {
   }
 }
 
-async function zoekDirect(q, melding) {
+export async function zoekDirect(q, melding) {
   if (q.length < 3) return;
   if (!protocolCheck(melding)) return;
   try {
@@ -128,5 +128,31 @@ async function zoekDirect(q, melding) {
     await openAdres(doc, melding);
   } catch {
     netwerkFout(melding);
+  }
+}
+
+/** Open dossier vanuit ?id= of ?q= in de URL. */
+export async function openVanShareUrl(melding) {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const q = params.get('q');
+  if (!id && !q) return false;
+  if (!protocolCheck(melding)) return false;
+
+  const input = $('adres');
+  try {
+    let doc = null;
+    if (id) doc = await haalAdresOpId(id);
+    if (!doc && q) doc = await haalAdresOp(q);
+    if (!doc) {
+      toonFout(melding, 'Dit gedeelde adres kon niet worden gevonden.');
+      return false;
+    }
+    if (input) input.value = doc.weergavenaam || q || '';
+    await openAdres(doc, melding);
+    return true;
+  } catch {
+    netwerkFout(melding);
+    return false;
   }
 }
