@@ -3,7 +3,10 @@ import { initSearch, openVanShareUrl } from './search.js';
 import { sluitDossier } from './dossier.js';
 import { initPremium } from './premium.js';
 import { deelHuidigAdres } from './share.js';
+import { initThema } from './theme.js';
 import './map.js';
+
+initThema();
 
 const { input, melding } = initSearch();
 initPremium();

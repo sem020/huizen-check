@@ -1,54 +1,94 @@
 /* Gedeelde stijl voor Over, Voorwaarden, Privacy */
+:root{
+  --bg:#f1f5f9;
+  --panel:#fff;
+  --text:#0f172a;
+  --dim:#475569;
+  --muted:#64748b;
+  --accent:#0d9488;
+  --accent-soft:#ccfbf1;
+  --line:rgba(15,23,42,.06);
+  --top-bg:rgba(255,255,255,.92);
+  --voet-bg:rgba(255,255,255,.6);
+  --color-scheme:light;
+}
+html[data-theme="dark"]{
+  --bg:#0b1220;
+  --panel:#111827;
+  --text:#f1f5f9;
+  --dim:#94a3b8;
+  --muted:#64748b;
+  --accent:#2dd4bf;
+  --accent-soft:rgba(45,212,191,.16);
+  --line:rgba(148,163,184,.12);
+  --top-bg:rgba(17,24,39,.92);
+  --voet-bg:rgba(15,23,42,.7);
+  --color-scheme:dark;
+}
+html{color-scheme:var(--color-scheme)}
 .static-pagina{
   font-family:'Plus Jakarta Sans',system-ui,sans-serif;
-  background:#f1f5f9;color:#0f172a;line-height:1.6;
+  background:var(--bg);color:var(--text);line-height:1.6;
   min-height:100vh;display:flex;flex-direction:column;
 }
 .static-top{
   display:flex;align-items:center;justify-content:space-between;
-  padding:18px 24px;background:rgba(255,255,255,.92);
-  border-bottom:1px solid rgba(15,23,42,.06);
+  padding:18px 24px;background:var(--top-bg);
+  border-bottom:1px solid var(--line);
   position:sticky;top:0;z-index:10;
   backdrop-filter:blur(12px);
 }
 .static-merk{
   font-size:1.15rem;font-weight:800;letter-spacing:-.03em;
-  color:#0f172a;text-decoration:none;
+  color:var(--text);text-decoration:none;
 }
-.static-merk i{color:#0d9488;font-style:normal}
-.static-nav{display:flex;gap:8px}
+.static-merk i{color:var(--accent);font-style:normal}
+.static-nav{display:flex;gap:8px;align-items:center}
 .static-nav-link{
-  font-size:.78rem;font-weight:700;color:#475569;text-decoration:none;
+  font-size:.78rem;font-weight:700;color:var(--dim);text-decoration:none;
   padding:7px 14px;border-radius:100px;transition:background .15s,color .15s;
 }
-.static-nav-link:hover{color:#0d9488;background:rgba(204,251,241,.5)}
-.static-nav-link.is-actief{color:#0d9488;background:#ccfbf1}
+.static-nav-link:hover{color:var(--accent);background:var(--accent-soft)}
+.static-nav-link.is-actief{color:var(--accent);background:var(--accent-soft)}
 .static-inhoud{
   flex:1;max-width:640px;width:100%;margin:0 auto;
   padding:40px 24px 48px;
 }
 .static-inhoud h1{
   font-size:1.65rem;font-weight:800;letter-spacing:-.03em;
-  margin-bottom:10px;line-height:1.15;
+  margin-bottom:10px;line-height:1.15;color:var(--text);
 }
-.static-inhoud .intro{font-size:.95rem;color:#475569;font-weight:500;margin-bottom:8px}
+.static-inhoud .intro{font-size:.95rem;color:var(--dim);font-weight:500;margin-bottom:8px}
 .static-inhoud h2{
   font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
-  color:#475569;margin-top:28px;margin-bottom:8px;font-weight:700;
+  color:var(--dim);margin-top:28px;margin-bottom:8px;font-weight:700;
 }
-.static-inhoud p,.static-inhoud li{font-size:.9rem;color:#475569;font-weight:500}
+.static-inhoud p,.static-inhoud li{font-size:.9rem;color:var(--dim);font-weight:500}
 .static-inhoud ul{padding-left:1.2rem;margin:8px 0}
 .static-inhoud .bron-lijst{list-style:none;padding:0;margin:12px 0}
 .static-inhoud .bron-lijst li{
-  padding:8px 0;border-bottom:1px solid rgba(15,23,42,.06);font-size:.88rem;
+  padding:8px 0;border-bottom:1px solid var(--line);font-size:.88rem;
 }
-.static-inhoud a{color:#0d9488;font-weight:600;text-decoration:none}
+.static-inhoud a{color:var(--accent);font-weight:600;text-decoration:none}
 .static-inhoud a:hover{text-decoration:underline}
 .static-voet{
   text-align:center;padding:20px 24px;
-  font-size:.72rem;color:#64748b;font-weight:500;
-  border-top:1px solid rgba(15,23,42,.06);
-  background:rgba(255,255,255,.6);
+  font-size:.72rem;color:var(--muted);font-weight:500;
+  border-top:1px solid var(--line);
+  background:var(--voet-bg);
 }
-.static-voet a{color:#0d9488;text-decoration:none;font-weight:600;margin:0 4px}
+.static-voet a{color:var(--accent);text-decoration:none;font-weight:600;margin:0 4px}
 .static-voet a:hover{text-decoration:underline}
+
+.thema-knop{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;padding:0;border:none;border-radius:100px;
+  background:transparent;color:var(--dim);cursor:pointer;
+  transition:color .15s, background .15s;
+}
+.thema-knop:hover{color:var(--accent);background:var(--accent-soft)}
+.thema-knop svg{width:18px;height:18px;display:block}
+.thema-knop .icoon-zon{display:none}
+.thema-knop .icoon-maan{display:block}
+html[data-theme="dark"] .thema-knop .icoon-zon{display:block}
+html[data-theme="dark"] .thema-knop .icoon-maan{display:none}
