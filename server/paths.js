@@ -1,9 +1,7 @@
-import { mkdirSync, writeFileSync, accessSync, constants } from 'fs';
-import { join, dirname } from 'path';
-import { tmpdir } from 'os';
-import { fileURLToPath } from 'url';
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const { mkdirSync, writeFileSync, accessSync, constants } = require('fs');
+const { join } = require('path');
+const { tmpdir } = require('os');
+const root = join(__dirname, '..');
 
 /**
  * Hostinger/PaaS: projectdir is soms read-only → val terug op /tmp.
@@ -27,7 +25,10 @@ function resolveDataDir() {
   throw new Error('Geen schrijfbare data-directory beschikbaar');
 }
 
-export const DATA_DIR = resolveDataDir();
-export const ROOT_DIR = root;
+const DATA_DIR = resolveDataDir();
+const ROOT_DIR = root;
 
 console.log(`Data directory: ${DATA_DIR}`);
+
+exports.DATA_DIR = DATA_DIR;
+exports.ROOT_DIR = ROOT_DIR;

@@ -46,7 +46,7 @@ function cleanTitel(s) {
  * @param {number} lon
  * @param {number} [straalM=60]
  */
-export async function zoekMonumenten(lat, lon, straalM = 60) {
+async function zoekMonumenten(lat, lon, straalM = 60) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     const err = new Error('lat/lon verplicht');
     err.status = 400;
@@ -129,3 +129,5 @@ export async function zoekMonumenten(lat, lon, straalM = 60) {
     stadsgezicht,
   };
 }
+
+exports.zoekMonumenten = zoekMonumenten;

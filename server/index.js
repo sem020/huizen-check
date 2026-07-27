@@ -1,19 +1,16 @@
-import express from 'express';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { existsSync } from 'fs';
-import { config, assertPaymentConfig, priceLabel } from './config.js';
-import { getOrder, pdfPath } from './store.js';
-import { createCheckout, handleMollieWebhook, mockPay } from './payments.js';
-import { labelOpVbo, labelOpAdres, pingEpOnline } from './ep-online.js';
-import { zoekMonumenten } from './monumenten.js';
-import { buurtCijfers } from './cbs.js';
-import { nabijheidCijfers } from './cbs-nabijheid.js';
-import { dichtstbijzijndeOv, warmOvCache } from './ov.js';
-import { wozOpNummeraanduiding } from './woz.js';
-import { dichtstbijzijndeSupermarkt } from './supermarkt.js';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const express = require('express');
+const { join } = require('path');
+const { existsSync } = require('fs');
+const { config, assertPaymentConfig, priceLabel } = require('./config.js');
+const { getOrder, pdfPath } = require('./store.js');
+const { createCheckout, handleMollieWebhook, mockPay } = require('./payments.js');
+const { labelOpVbo, labelOpAdres, pingEpOnline } = require('./ep-online.js');
+const { zoekMonumenten } = require('./monumenten.js');
+const { buurtCijfers } = require('./cbs.js');
+const { nabijheidCijfers } = require('./cbs-nabijheid.js');
+const { dichtstbijzijndeOv, warmOvCache } = require('./ov.js');
+const { wozOpNummeraanduiding } = require('./woz.js');
+const { dichtstbijzijndeSupermarkt } = require('./supermarkt.js');
 const root = join(__dirname, '..');
 
 assertPaymentConfig();

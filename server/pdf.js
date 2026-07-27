@@ -1,7 +1,6 @@
-import PDFDocument from 'pdfkit';
-import { createWriteStream } from 'fs';
-import { pdfPath } from './store.js';
-
+const PDFDocument = require('pdfkit');
+const { createWriteStream } = require('fs');
+const { pdfPath } = require('./store.js');
 const PAGE = { left: 48, right: 48, top: 48, bottom: 52 };
 const W = 595.28 - PAGE.left - PAGE.right; // A4 content width
 const COLORS = {
@@ -50,7 +49,7 @@ function labelKleur(k) {
 /**
  * Genereert een PDF-bestand voor een order. Retourneert pad naar bestand.
  */
-export function genereerPdfBestand(order) {
+function genereerPdfBestand(order) {
   const d = order.dossier || {};
   const out = pdfPath(order.id);
   const datum = fmtDatum(order.createdAt || Date.now()) || '';
@@ -436,3 +435,5 @@ export function genereerPdfBestand(order) {
     stream.on('error', reject);
   });
 }
+
+exports.genereerPdfBestand = genereerPdfBestand;

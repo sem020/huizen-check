@@ -1,10 +1,9 @@
-import { readFileSync } from 'fs';
-import { config } from './config.js';
-
+const { readFileSync } = require('fs');
+const { config } = require('./config.js');
 /**
  * Verstuurt PDF per e-mail. Zonder RESEND_API_KEY: mock (log naar console).
  */
-export async function stuurRapportMail(order, pdfFilePath) {
+async function stuurRapportMail(order, pdfFilePath) {
   const onderwerp = `Je Pandloket: ${order.dossier?.adres || 'woningrapport'}`;
   const tekst = [
     `Hallo,`,
@@ -56,3 +55,5 @@ export async function stuurRapportMail(order, pdfFilePath) {
 
   return { mocked: false, ...(await res.json()) };
 }
+
+exports.stuurRapportMail = stuurRapportMail;

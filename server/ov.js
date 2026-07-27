@@ -2,14 +2,13 @@
  * Dichtstbijzijnde OV-halten via OVapi GTFS stops.txt (gecached).
  * Bron: https://gtfs.ovapi.nl/ — Bus/Tram/Metro/Trein.
  */
-import { createWriteStream, existsSync, mkdirSync, readFileSync, statSync, writeFileSync, unlinkSync } from 'fs';
-import { join } from 'path';
-import { pipeline } from 'stream/promises';
-import { execFile } from 'child_process';
-import { promisify } from 'util';
-import { tmpdir } from 'os';
-import { DATA_DIR } from './paths.js';
-
+const { createWriteStream, existsSync, mkdirSync, readFileSync, statSync, writeFileSync, unlinkSync } = require('fs');
+const { join } = require('path');
+const { pipeline } = require('stream/promises');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+const { tmpdir } = require('os');
+const { DATA_DIR } = require('./paths.js');
 const execFileAsync = promisify(execFile);
 const STOPS_PATH = join(DATA_DIR, 'stops.txt');
 const META_PATH = join(DATA_DIR, 'ov-meta.json');
@@ -223,7 +222,7 @@ async function ensureStopsLoaded() {
  * @param {number} lon
  * @param {{ limiet?: number, straalM?: number }} [opts]
  */
-export async function dichtstbijzijndeOv(lat, lon, opts = {}) {
+async function dichtstbijzijndeOv(lat, lon, opts = {}) {
   const limiet = Math.min(Math.max(Number(opts.limiet) || 5, 1), 15);
   const straalM = Math.min(Math.max(Number(opts.straalM) || 1500, 200), 5000);
 
@@ -279,6 +278,9 @@ export async function dichtstbijzijndeOv(lat, lon, opts = {}) {
 }
 
 /** Warm cache at server start (non-blocking). */
-export function warmOvCache() {
+function warmOvCache() {
   ensureStopsLoaded().catch(e => console.warn('OV warm-up:', e.message));
 }
+
+exports.dichtstbijzijndeOv = dichtstbijzijndeOv;
+exports.warmOvCache = warmOvCache;

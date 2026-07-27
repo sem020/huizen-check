@@ -11,7 +11,7 @@ function padNa(id) {
  * @param {string} nummeraanduidingId BAG-nummeraanduiding (16 cijfers)
  * @returns {Promise<{ wozWaarden: { jaar: number, waarde: number }[], object?: object } | null>}
  */
-export async function wozOpNummeraanduiding(nummeraanduidingId) {
+async function wozOpNummeraanduiding(nummeraanduidingId) {
   const na = padNa(nummeraanduidingId);
   if (!na) {
     const err = new Error('nummeraanduiding verplicht');
@@ -58,3 +58,5 @@ export async function wozOpNummeraanduiding(nummeraanduidingId) {
     bron: 'Kadaster WOZ-waardeloket',
   };
 }
+
+exports.wozOpNummeraanduiding = wozOpNummeraanduiding;

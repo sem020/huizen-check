@@ -1,9 +1,8 @@
-import { randomUUID } from 'crypto';
-import { config, priceLabel } from './config.js';
-import { saveOrder, getOrder, updateOrder } from './store.js';
-import { genereerPdfBestand } from './pdf.js';
-import { stuurRapportMail } from './mail.js';
-
+const { randomUUID } = require('crypto');
+const { config, priceLabel } = require('./config.js');
+const { saveOrder, getOrder, updateOrder } = require('./store.js');
+const { genereerPdfBestand } = require('./pdf.js');
+const { stuurRapportMail } = require('./mail.js');
 const MOLLIE_API = 'https://api.mollie.com/v2';
 
 function dossierSnapshot(raw = {}) {
@@ -55,7 +54,7 @@ function dossierSnapshot(raw = {}) {
   };
 }
 
-export async function createCheckout({ email, dossier }) {
+async function createCheckout({ email, dossier }) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     const err = new Error('Geldig e-mailadres verplicht');
     err.status = 400;
@@ -127,7 +126,7 @@ async function mollieCreatePayment(order) {
   return res.json();
 }
 
-export async function markeerBetaald(orderId, { source = 'unknown' } = {}) {
+async function markeerBetaald(orderId, { source = 'unknown' } = {}) {
   const order = getOrder(orderId);
   if (!order) return null;
   if (order.status === 'paid') return order;
@@ -151,7 +150,7 @@ export async function markeerBetaald(orderId, { source = 'unknown' } = {}) {
   return getOrder(orderId);
 }
 
-export async function handleMollieWebhook(paymentId) {
+async function handleMollieWebhook(paymentId) {
   if (!paymentId) return null;
 
   const res = await fetch(`${MOLLIE_API}/payments/${paymentId}`, {
@@ -175,7 +174,7 @@ export async function handleMollieWebhook(paymentId) {
 }
 
 /** Mock: simuleer succesvolle betaling (alleen in mock mode). */
-export async function mockPay(orderId) {
+async function mockPay(orderId) {
   if (config.paymentMode !== 'mock') {
     const err = new Error('Mock-betaling alleen beschikbaar in PAYMENT_MODE=mock');
     err.status = 403;
@@ -189,3 +188,8 @@ export async function mockPay(orderId) {
   }
   return markeerBetaald(orderId, { source: 'mock' });
 }
+
+exports.createCheckout = createCheckout;
+exports.markeerBetaald = markeerBetaald;
+exports.handleMollieWebhook = handleMollieWebhook;
+exports.mockPay = mockPay;

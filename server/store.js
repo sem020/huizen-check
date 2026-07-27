@@ -1,7 +1,6 @@
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { DATA_DIR } from './paths.js';
-
+const { mkdirSync, readFileSync, writeFileSync, existsSync } = require('fs');
+const { join } = require('path');
+const { DATA_DIR } = require('./paths.js');
 const ordersFile = join(DATA_DIR, 'orders.json');
 const pdfDir = join(DATA_DIR, 'pdfs');
 
@@ -20,18 +19,18 @@ function writeAll(data) {
   writeFileSync(ordersFile, JSON.stringify(data, null, 2));
 }
 
-export function saveOrder(order) {
+function saveOrder(order) {
   const all = readAll();
   all[order.id] = order;
   writeAll(all);
   return order;
 }
 
-export function getOrder(id) {
+function getOrder(id) {
   return readAll()[id] || null;
 }
 
-export function updateOrder(id, patch) {
+function updateOrder(id, patch) {
   const all = readAll();
   if (!all[id]) return null;
   all[id] = { ...all[id], ...patch, updatedAt: new Date().toISOString() };
@@ -39,8 +38,13 @@ export function updateOrder(id, patch) {
   return all[id];
 }
 
-export function pdfPath(orderId) {
+function pdfPath(orderId) {
   return join(pdfDir, `${orderId}.pdf`);
 }
 
-export { pdfDir };
+exports.pdfDir = pdfDir;
+
+exports.saveOrder = saveOrder;
+exports.getOrder = getOrder;
+exports.updateOrder = updateOrder;
+exports.pdfPath = pdfPath;

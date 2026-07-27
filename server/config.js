@@ -1,10 +1,10 @@
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 // Geen override: Hostinger/panel-env vars winnen van een eventuele .env.
 dotenv.config();
 
 const mode = (process.env.PAYMENT_MODE || 'mock').toLowerCase();
 
-export const config = {
+const config = {
   // Hostinger injecteert PORT; lokaal default 3000. Bind altijd op 0.0.0.0 (niet alleen localhost).
   host: process.env.HOST || '0.0.0.0',
   port: Number(process.env.PORT || 3000),
@@ -18,11 +18,11 @@ export const config = {
   epOnlineApiKey: (process.env.EP_ONLINE_API_KEY || '').trim(),
 };
 
-export function priceLabel() {
+function priceLabel() {
   return (config.priceCents / 100).toFixed(2).replace('.', ',');
 }
 
-export function assertPaymentConfig() {
+function assertPaymentConfig() {
   if (config.paymentMode === 'mock') return;
   if (!config.mollieApiKey) {
     // Niet crashen op hosting: val terug op mock i.p.v. 503.
@@ -39,3 +39,7 @@ export function assertPaymentConfig() {
     console.warn('⚠️  PAYMENT_MODE=live maar key begint niet met live_ — controleer je Mollie-key.');
   }
 }
+
+exports.priceLabel = priceLabel;
+exports.assertPaymentConfig = assertPaymentConfig;
+exports.config = config;

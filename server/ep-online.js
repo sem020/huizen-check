@@ -1,5 +1,4 @@
-import { config } from './config.js';
-
+const { config } = require('./config.js');
 const EP_BASE = 'https://public.ep-online.nl/api/v5';
 
 function authHeaders() {
@@ -71,7 +70,7 @@ async function epFetch(path) {
 }
 
 /** Op BAG verblijfsobject-id (16 cijfers). */
-export async function labelOpVbo(vboId) {
+async function labelOpVbo(vboId) {
   const id = String(vboId || '').replace(/\D/g, '').padStart(16, '0');
   if (!id || id === '0000000000000000') {
     const err = new Error('Ongeldig verblijfsobject-id');
@@ -82,7 +81,7 @@ export async function labelOpVbo(vboId) {
 }
 
 /** Op postcode + huisnummer (+ optioneel letter/toevoeging). */
-export async function labelOpAdres({ postcode, huisnummer, huisletter, toevoeging }) {
+async function labelOpAdres({ postcode, huisnummer, huisletter, toevoeging }) {
   const pc = String(postcode || '').replace(/\s+/g, '').toUpperCase();
   const nr = String(huisnummer || '').replace(/\D/g, '');
   if (!pc || !nr) {
@@ -96,8 +95,12 @@ export async function labelOpAdres({ postcode, huisnummer, huisletter, toevoegin
   return epFetch(`/PandEnergielabel/Adres?${q}`);
 }
 
-export async function pingEpOnline() {
+async function pingEpOnline() {
   if (!config.epOnlineApiKey) return { ok: false, reason: 'no-key' };
   const r = await fetch(`${EP_BASE}/Ping`, { headers: authHeaders() });
   return { ok: r.ok, status: r.status };
 }
+
+exports.labelOpVbo = labelOpVbo;
+exports.labelOpAdres = labelOpAdres;
+exports.pingEpOnline = pingEpOnline;

@@ -21,7 +21,7 @@ function num(v) {
  * Haal CBS-buurtcijfers op via buurtnaam + gemeentecode (Locatieserver-codes
  * komen niet 1-op-1 overeen met CBS-keys).
  */
-export async function buurtCijfers({ buurtnaam, gemeentecode, gemeentenaam }) {
+async function buurtCijfers({ buurtnaam, gemeentecode, gemeentenaam }) {
   if (!buurtnaam) {
     const err = new Error('buurtnaam verplicht');
     err.status = 400;
@@ -124,3 +124,5 @@ export async function buurtCijfers({ buurtnaam, gemeentecode, gemeentenaam }) {
     bron: 'CBS Kerncijfers wijken en buurten',
   };
 }
+
+exports.buurtCijfers = buurtCijfers;

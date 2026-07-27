@@ -35,6 +35,7 @@ Open **http://localhost:3000**
 
 - Entry file: `server/index.js`
 - Start command / package.json: `npm start` → `node server/index.js`
+- Server is **CommonJS** (geen `"type": "module"`) — nodig voor Hostinger’s preload `require()`
 - Output directory: leeg
 - Env: `PORT=3000`, `PUBLIC_URL=https://pandloket.nl`, `PAYMENT_MODE=mock`
 - Na deploy: Restart, test `/api/health`

@@ -108,7 +108,7 @@ async function fetchNabijheid(tableId, key, titel) {
 /**
  * Gemiddelde reisafstanden tot voorzieningen voor de buurt/wijk van het adres.
  */
-export async function nabijheidCijfers({ buurtnaam, gemeentecode, gemeentenaam }) {
+async function nabijheidCijfers({ buurtnaam, gemeentecode, gemeentenaam }) {
   if (!buurtnaam) {
     const err = new Error('buurtnaam verplicht');
     err.status = 400;
@@ -126,3 +126,5 @@ export async function nabijheidCijfers({ buurtnaam, gemeentecode, gemeentenaam }
   }
   return null;
 }
+
+exports.nabijheidCijfers = nabijheidCijfers;

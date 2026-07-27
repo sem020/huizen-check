@@ -117,7 +117,7 @@ async function overpassQuery(query) {
  * @param {number} lon
  * @param {{ straalM?: number, limiet?: number }} [opts]
  */
-export async function dichtstbijzijndeSupermarkt(lat, lon, opts = {}) {
+async function dichtstbijzijndeSupermarkt(lat, lon, opts = {}) {
   const straalM = Math.min(Math.max(Number(opts.straalM) || 1500, 300), 3000);
   const limiet = Math.min(Math.max(Number(opts.limiet) || 8, 1), 15);
 
@@ -178,3 +178,5 @@ out center 80;`;
     bronUrl: 'https://www.openstreetmap.org/',
   };
 }
+
+exports.dichtstbijzijndeSupermarkt = dichtstbijzijndeSupermarkt;
