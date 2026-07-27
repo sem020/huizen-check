@@ -131,11 +131,16 @@ export async function zoekDirect(q, melding) {
   }
 }
 
-/** Open dossier vanuit ?id= of ?q= in de URL. */
+/** Open dossier vanuit /pand/…, ?id= of ?q=. */
 export async function openVanShareUrl(melding) {
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
-  const q = params.get('q');
+  const qParam = params.get('q');
+  const slugMatch = location.pathname.match(/^\/pand\/([^/]+)\/?$/);
+  const slugQ = slugMatch
+    ? decodeURIComponent(slugMatch[1]).replace(/-/g, ' ').replace(/\s+/g, ' ').trim()
+    : '';
+  const q = qParam || slugQ;
   if (!id && !q) return false;
   if (!protocolCheck(melding)) return false;
 

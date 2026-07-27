@@ -3,21 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pandloket — alle open data over één adres</title>
-<meta name="description" content="Vul een adres in en zie direct bouwjaar, oppervlakte, WOZ-waarde en alle officiële open bronnen over dat pand.">
+<title>Pandloket — open data over elk Nederlands adres</title>
+<meta name="description" content="Zoek een adres en zie gratis bouwjaar, woonoppervlak, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële open bronnen.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0d9488">
+<link rel="canonical" href="https://pandloket.nl/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:site_name" content="Pandloket">
+<meta property="og:title" content="Pandloket — open data over elk Nederlands adres">
+<meta property="og:description" content="Zoek een adres en zie gratis bouwjaar, woonoppervlak, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële open bronnen.">
+<meta property="og:url" content="https://pandloket.nl/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pandloket — open data over elk Nederlands adres">
+<meta name="twitter:description" content="Zoek een adres en zie gratis bouwjaar, woonoppervlak, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële open bronnen.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "Pandloket",
+      "url": "https://pandloket.nl/",
+      "description": "Openbare woninggegevens uit officiële Nederlandse registers.",
+      "inLanguage": "nl-NL",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://pandloket.nl/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "name": "Pandloket",
+      "url": "https://pandloket.nl/",
+      "email": "info@pandloket.nl"
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
 <div id="map" aria-hidden="true"></div>
 
 <div class="top">
-  <a href="./" class="merk">Pand<i>loket</i></a>
+  <a href="/" class="merk">Pand<i>loket</i></a>
   <div class="top-rechts">
-    <a href="over.html" class="top-link">Over</a>
+    <a href="/over" class="top-link">Over</a>
     <div class="tag">Open data · Kadaster · BAG · WOZ</div>
   </div>
 </div>
@@ -159,7 +196,7 @@
       <p>Open data vertelt niet alles. Een bouwkundige keuring wél. <a href="#" rel="sponsored">Vergelijk keurders →</a></p>
     </div>
   </div>
-  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer, CBS, EP-Online). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="over.html">Bronnen &amp; over</a> · <a href="av.html">Voorwaarden</a> · <a href="privacy.html">Privacy</a></div>
+  <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer, CBS, EP-Online). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="/over">Bronnen &amp; over</a> · <a href="/av">Voorwaarden</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="modal" id="premium-modal" role="dialog" aria-labelledby="premium-titel" aria-modal="true" hidden>
@@ -185,6 +222,6 @@
 <button class="herzoek" id="herzoek">⌕ &nbsp;Nieuw adres</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script type="module" src="js/main.js"></script>
+<script type="module" src="/js/main.js"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ const { nabijheidCijfers } = require('./cbs-nabijheid.js');
 const { dichtstbijzijndeOv, warmOvCache } = require('./ov.js');
 const { wozOpNummeraanduiding } = require('./woz.js');
 const { dichtstbijzijndeSupermarkt } = require('./supermarkt.js');
+const { renderIndex, unslug, sitemapXml, robotsTxt } = require('./seo.js');
 const root = join(__dirname, '..');
 
 assertPaymentConfig();
@@ -18,6 +19,38 @@ assertPaymentConfig();
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain').send(robotsTxt(config.publicUrl));
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  res.type('application/xml').send(sitemapXml(config.publicUrl));
+});
+
+/** Oude .html-URL’s → schone paden (SEO). */
+for (const [from, to] of [
+  ['/over.html', '/over'],
+  ['/privacy.html', '/privacy'],
+  ['/av.html', '/av'],
+  ['/bedankt.html', '/bedankt'],
+  ['/mock-pay.html', '/mock-pay'],
+]) {
+  app.get(from, (_req, res) => res.redirect(301, to));
+}
+
+/** SEO-vriendelijke pand-URL’s: /pand/straat-huisnummer-plaats?id=… */
+app.get('/pand/:slug', (req, res) => {
+  const label = unslug(req.params.slug) || 'Adres';
+  const id = req.query.id ? `?id=${encodeURIComponent(String(req.query.id))}` : '';
+  const canonical = `${config.publicUrl}/pand/${req.params.slug}${id}`;
+  const html = renderIndex(root, {
+    title: `${label} — Pandloket`,
+    description: `Openbare gegevens over ${label}: bouwjaar, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële registers.`,
+    canonical,
+  });
+  res.type('html').send(html);
+});
 
 app.get('/api/health', async (_req, res) => {
   let ep = { ok: false, reason: 'no-key' };

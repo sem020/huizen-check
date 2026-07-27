@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /bedankt
+Disallow: /mock-pay
+Disallow: /data/
+
+Sitemap: https://pandloket.nl/sitemap.xml
