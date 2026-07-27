@@ -1,13 +1,9 @@
 const KEY = 'pandloket_theme';
 
-function systeemThema() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
 export function huidigThema() {
   const opgeslagen = localStorage.getItem(KEY);
   if (opgeslagen === 'dark' || opgeslagen === 'light') return opgeslagen;
-  return systeemThema();
+  return 'light';
 }
 
 export function zetThema(thema) {
@@ -29,11 +25,4 @@ export function initThema() {
   zetThema(huidigThema());
   const knop = document.getElementById('thema-knop');
   if (knop) knop.addEventListener('click', wisselThema);
-
-  // Volg systeem alleen als gebruiker nog geen keuze heeft opgeslagen
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (localStorage.getItem(KEY) !== 'dark' && localStorage.getItem(KEY) !== 'light') {
-      zetThema(systeemThema());
-    }
-  });
 }
