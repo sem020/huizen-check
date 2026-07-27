@@ -70,13 +70,13 @@ function bouwHtml() {
   const monCard = `<div class="mini"><div class="mini-l">Monumenten</div>${monBody}</div>`;
 
   const cbsBlock = cbs?.buurt ? `
-    <h2><i></i>Buurt (CBS)</h2>
+    <h2><i></i>Buurt (CBS${cbs.jaar ? ' ' + cbs.jaar : ''})</h2>
     <p class="buurt-naam">${esc(cbs.buurt)}${cbs.gemeente ? ', ' + esc(cbs.gemeente) : ''}</p>
     <div class="cbs">
       <div><b>${cbs.inwoners?.toLocaleString('nl-NL') ?? '—'}</b><span>Inwoners</span></div>
       <div><b>${cbs.huishoudens?.toLocaleString('nl-NL') ?? '—'}</b><span>Huishoudens</span></div>
       <div><b>${cbs.woningen?.toLocaleString('nl-NL') ?? '—'}</b><span>Woningen</span></div>
-      <div><b>${cbs.gemWoz != null ? fmtEur(Math.round(cbs.gemWoz)) : '—'}</b><span>Gem. WOZ</span></div>
+      <div><b>${cbs.gemWoz != null ? fmtEur(Math.round(cbs.gemWoz)) : '—'}</b><span>Gem. WOZ${cbs.jaar ? ' ' + cbs.jaar : ''}</span></div>
       <div><b>${cbs.pctKoop != null ? cbs.pctKoop + '%' : '—'}</b><span>Koop</span></div>
       <div><b>${cbs.pctHuur != null ? cbs.pctHuur + '%' : '—'}</b><span>Huur</span></div>
     </div>` : '';

@@ -44,6 +44,7 @@ function dossierSnapshot(raw = {}) {
     cbs: raw.cbs ? {
       buurt: String(raw.cbs.buurt || '').slice(0, 80),
       gemeente: String(raw.cbs.gemeente || '').slice(0, 80),
+      jaar: raw.cbs.jaar ?? null,
       inwoners: raw.cbs.inwoners ?? null,
       huishoudens: raw.cbs.huishoudens ?? null,
       woningen: raw.cbs.woningen ?? null,

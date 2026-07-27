@@ -226,7 +226,7 @@ function genereerPdfBestand(order) {
     doc.y = colY + colH + 16;
 
     // ===== CBS BUURT =====
-    sectionTitle('Buurt (CBS)');
+    sectionTitle(d.cbs?.jaar ? `Buurt (CBS ${d.cbs.jaar})` : 'Buurt (CBS)');
     if (d.cbs?.buurt) {
       const c = d.cbs;
       doc.fillColor(COLORS.ink).font('Helvetica-Bold').fontSize(11)
@@ -237,7 +237,7 @@ function genereerPdfBestand(order) {
         ['Inwoners', c.inwoners != null ? c.inwoners.toLocaleString('nl-NL') : '—'],
         ['Huishoudens', c.huishoudens != null ? c.huishoudens.toLocaleString('nl-NL') : '—'],
         ['Woningen', c.woningen != null ? c.woningen.toLocaleString('nl-NL') : '—'],
-        ['Gem. WOZ', c.gemWoz != null ? fmtEur(Math.round(c.gemWoz)) : '—'],
+        [c.jaar ? `Gem. WOZ ${c.jaar}` : 'Gem. WOZ', c.gemWoz != null ? fmtEur(Math.round(c.gemWoz)) : '—'],
         ['Koop', c.pctKoop != null ? `${c.pctKoop}%` : '—'],
         ['Huur', c.pctHuur != null ? `${c.pctHuur}%` : '—'],
       ];

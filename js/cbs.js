@@ -47,14 +47,15 @@ export async function laadCbs(doc) {
 
     status.textContent = '';
     box.style.display = 'block';
-    $('cbs-naam').textContent = b.buurt + (b.gemeente ? `, ${b.gemeente}` : '');
+    const jaar = b.jaar ? ` · CBS ${b.jaar}` : '';
+    $('cbs-naam').textContent = b.buurt + (b.gemeente ? `, ${b.gemeente}` : '') + jaar;
 
     const cells = [
       ['Inwoners', fmtN(b.inwoners)],
       ['Huishoudens', fmtN(b.huishoudens)],
       ['Woningen', fmtN(b.woningen)],
       ['Dichtheid', b.dichtheid != null ? fmtN(b.dichtheid) + '/km²' : '—'],
-      ['Gem. WOZ', fmtEurK(b.gemWoz)],
+      [b.jaar ? `Gem. WOZ (${b.jaar})` : 'Gem. WOZ', fmtEurK(b.gemWoz)],
       ['Koop / huur', (b.pctKoop != null || b.pctHuur != null)
         ? `${b.pctKoop ?? '—'}% / ${b.pctHuur ?? '—'}%`
         : '—'],
