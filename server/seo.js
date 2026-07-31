@@ -24,11 +24,19 @@ function unslug(slug) {
 /**
  * Injecteer SEO-tags in index.html voor /pand/… (crawlers zonder JS).
  */
-function renderIndex(root, { title, description, canonical, robots = 'index,follow' }) {
+function renderIndex(root, {
+  title,
+  description,
+  canonical,
+  robots = 'index,follow',
+  placeName = null,
+}) {
   let html = loadIndex(root);
   const t = esc(title);
   const d = esc(description);
   const c = esc(canonical);
+  const base = canonical.match(/^(https?:\/\/[^/]+)/)?.[1] || 'https://pandloket.nl';
+  const image = `${base}/og-image.png`;
 
   html = html.replace(/<title>[^<]*<\/title>/i, `<title>${t}</title>`);
   if (/<meta\s+name="description"/i.test(html)) {
@@ -45,6 +53,36 @@ function renderIndex(root, { title, description, canonical, robots = 'index,foll
   html = html.replace(/<link\s+rel="canonical"[^>]*>\s*/gi, '');
   html = html.replace(/<meta\s+property="og:[^"]+"[^>]*>\s*/gi, '');
   html = html.replace(/<meta\s+name="twitter:[^"]+"[^>]*>\s*/gi, '');
+  html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/i, '');
+
+  const placeLd = placeName
+    ? `,
+    {
+      "@type": "Place",
+      "name": ${JSON.stringify(placeName)},
+      "url": ${JSON.stringify(canonical)},
+      "description": ${JSON.stringify(description)}
+    }`
+    : '';
+
+  const ld = `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": ${JSON.stringify(title)},
+      "url": ${JSON.stringify(canonical)},
+      "description": ${JSON.stringify(description)},
+      "isPartOf": { "@type": "WebSite", "name": "Pandloket", "url": "${base}/" }
+    },
+    {
+      "@type": "Organization",
+      "name": "Pandloket",
+      "url": "${base}/",
+      "email": "info@pandloket.nl"
+    }${placeLd}
+  ]
+}`;
 
   const block = `
 <meta name="robots" content="${esc(robots)}">
@@ -55,9 +93,16 @@ function renderIndex(root, { title, description, canonical, robots = 'index,foll
 <meta property="og:title" content="${t}">
 <meta property="og:description" content="${d}">
 <meta property="og:url" content="${c}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="${esc(image)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${t}">
 <meta name="twitter:description" content="${d}">
+<meta name="twitter:image" content="${esc(image)}">
+<script type="application/ld+json">
+${ld}
+</script>
 `;
   html = html.replace(/<\/head>/i, `${block}</head>`);
   return html;

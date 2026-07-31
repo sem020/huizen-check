@@ -1,6 +1,6 @@
 import { $, apiUrl } from './config.js';
 import { fmtEur, padNa } from './utils.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 
 const SPARK_DEFS = `<defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
   <stop offset="0" stop-color="rgba(13,148,136,.22)"/><stop offset="1" stop-color="rgba(13,148,136,0)"/>
@@ -174,10 +174,17 @@ function tekenSpark(w) {
   toonPeiljaar(last);
 }
 
-export async function laadWoz(doc) {
+export async function laadWoz(doc, gen) {
   const naId = padNa(doc.nummeraanduiding_id);
-  const klaarStat = t => { const el = $('s-woz'); el.classList.remove('skelet'); el.textContent = t; };
+  const klaarStat = t => {
+    if (!isActieveGeneratie(gen)) return;
+    const el = $('s-woz');
+    el.classList.remove('skelet');
+    el.textContent = t;
+    el.removeAttribute('aria-hidden');
+  };
   const fallback = (msg, isError = true) => {
+    if (!isActieveGeneratie(gen)) return;
     klaarStat('—');
     dossierState.wozKort = '—';
     dossierState.wozBedrag = '—';
@@ -196,6 +203,7 @@ export async function laadWoz(doc) {
   try {
     const r = await fetch(apiUrl(`/api/woz?na=${encodeURIComponent(naId)}`));
     const j = await r.json().catch(() => ({}));
+    if (!isActieveGeneratie(gen)) return;
 
     if (r.status === 404) {
       return fallback(

@@ -1,5 +1,5 @@
 import { $, apiUrl } from './config.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 import { toonOvOpKaart } from './map.js';
 
 function fmtM(m) {
@@ -16,25 +16,40 @@ const SOORT_LABEL = {
   ov: 'OV',
 };
 
-export async function laadOv(lat, lon) {
+const COLD_MSG =
+  'OV-halten ophalen… De eerste keer kan dit tot een minuut duren (haltebestand wordt geladen).';
+
+function bindRetry(status, lat, lon, gen) {
+  const btn = status?.querySelector('[data-ov-retry]');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (!isActieveGeneratie(gen)) return;
+    laadOv(lat, lon, gen);
+  });
+}
+
+export async function laadOv(lat, lon, gen) {
   const status = $('ov-status');
   const box = $('ov-inhoud');
   if (status) {
-    status.textContent = 'OV-halten ophalen…';
+    status.textContent = COLD_MSG;
     status.className = 'status';
   }
   if (box) box.style.display = 'none';
-  dossierState.ov = null;
-  toonOvOpKaart([]);
+  if (isActieveGeneratie(gen)) {
+    dossierState.ov = null;
+    toonOvOpKaart([]);
+  }
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    if (status) status.textContent = 'Geen coördinaten voor OV-zoektocht.';
+    if (isActieveGeneratie(gen) && status) status.textContent = 'Geen coördinaten voor OV-zoektocht.';
     return;
   }
 
   try {
     const r = await fetch(apiUrl(`/api/ov-dichtbij?lat=${lat}&lon=${lon}&limiet=5&straal=1500`));
     const j = await r.json();
+    if (!isActieveGeneratie(gen)) return;
     if (!r.ok) throw new Error(j.error || 'Fout ' + r.status);
 
     dossierState.ov = j;
@@ -59,9 +74,13 @@ export async function laadOv(lat, lon) {
     }).join('');
     toonOvOpKaart(halten);
   } catch (e) {
+    if (!isActieveGeneratie(gen)) return;
     if (status) {
-      status.textContent = 'Kon OV-halten niet ophalen.';
+      status.innerHTML =
+        `Kon OV-halten niet ophalen. Probeer het opnieuw als de server even bezig is met laden. ` +
+        `<button type="button" class="status-retry" data-ov-retry>Opnieuw proberen</button>`;
       status.className = 'status f';
+      bindRetry(status, lat, lon, gen);
     }
     console.warn('OV:', e.message);
   }

@@ -1,6 +1,6 @@
 import { WFS, $ } from './config.js';
 import { padBag } from './utils.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 
 function bagFilter(field, value) {
   return `<Filter><PropertyIsEqualTo><PropertyName>${field}</PropertyName><Literal>${value}</Literal></PropertyIsEqualTo></Filter>`;
@@ -18,12 +18,19 @@ async function bagWfs(typeName, id) {
   return props && padBag(props.identificatie) === ident ? props : null;
 }
 
-export async function laadBag(doc) {
-  const klaar = (id, tekst) => { const el = $(id); el.classList.remove('skelet'); el.textContent = tekst; };
+export async function laadBag(doc, gen) {
+  const klaar = (id, tekst) => {
+    if (!isActieveGeneratie(gen)) return;
+    const el = $(id);
+    el.classList.remove('skelet');
+    el.textContent = tekst;
+    el.removeAttribute('aria-hidden');
+  };
   try {
     const vboId = doc.adresseerbaarobject_id;
     if (!vboId) throw new Error('geen id');
     const vbo = await bagWfs('bag:verblijfsobject', vboId);
+    if (!isActieveGeneratie(gen)) return;
     if (!vbo) throw new Error('vbo niet gevonden');
 
     const opp = vbo.oppervlakte ? vbo.oppervlakte + ' m²' : '—';
@@ -47,8 +54,9 @@ export async function laadBag(doc) {
     if (vbo.pandstatus) chips.push(`<span class="chip">${vbo.pandstatus}</span>`);
     $('chips').innerHTML = chips.join('');
   } catch {
+    if (!isActieveGeneratie(gen)) return;
     klaar('s-bouwjaar', '—'); klaar('s-opp', '—');
     $('chips').innerHTML = `<span class="chip">BAG-details tijdelijk niet bereikbaar — <a style="color:var(--accent)" href="https://bagviewer.kadaster.nl/" target="_blank" rel="noopener">open BAG Viewer</a></span>`;
   }
-  dossierState.klaar.bag = true;
+  if (isActieveGeneratie(gen)) dossierState.klaar.bag = true;
 }

@@ -224,15 +224,7 @@ body:has(.dossier.open) #map::after{
   background:none;border:0;cursor:pointer;color:var(--text);font-family:inherit;font-size:.92rem;
 }
 .sug button small{color:var(--dim);font-weight:500}
-.sug button:hover,.sug button:focus-visible{background:var(--accent-soft);outline:none}
-.voorbeelden{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start}
-.voorbeelden button{
-  background:var(--glass);border:none;color:var(--dim);
-  font-family:inherit;font-size:.78rem;font-weight:600;padding:8px 14px;border-radius:100px;
-  cursor:pointer;transition:all .18s;box-shadow:var(--shadow);
-  backdrop-filter:blur(8px);
-}
-.voorbeelden button:hover{color:var(--accent);background:var(--hover-lift);box-shadow:var(--shadow-float)}
+.sug button:hover,.sug button:focus-visible,.sug button.actief{background:var(--accent-soft);outline:none}
 .melding{
   margin-top:14px;display:none;font-size:.84rem;color:var(--warn);font-weight:500;
   background:var(--warn-soft);border:none;
@@ -296,7 +288,7 @@ body:has(.dossier.open) #map::after{
   letter-spacing:-.02em;color:var(--text);
 }
 .stat .n.skelet{
-  color:transparent;
+  color:transparent;min-height:1.1em;min-width:3.2ch;
   background:linear-gradient(90deg,var(--line-soft),var(--line),var(--line-soft));
   background-size:200% 100%;animation:glim 1.2s infinite;border-radius:6px;
 }
@@ -353,6 +345,10 @@ body:has(.dossier.open) #map::after{
 .blok .status{font-size:.84rem;color:var(--dim);line-height:1.5;font-weight:500}
 .blok .status a{color:var(--accent);font-weight:700}
 .blok .status.f{color:var(--warn)}
+.status-retry{
+  display:inline-block;margin-left:6px;padding:0;border:0;background:none;
+  color:var(--accent);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;
+}
 
 /* energielabel */
 .el-inhoud{display:flex;align-items:center;gap:16px}
@@ -540,7 +536,6 @@ body:has(.dossier.open) #map::after{
   }
   .kaart-ruimte{display:none}
   .etalage{text-align:center}
-  .voorbeelden{justify-content:center}
 }
 @media(max-width:640px){
   .dossier{width:100%}

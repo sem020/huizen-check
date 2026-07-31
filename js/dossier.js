@@ -16,11 +16,14 @@ export async function toonDossier(doc) {
   if (!doc?.weergavenaam) throw new Error('ongeldig adres');
 
   resetDossierState();
+  const gen = dossierState.generatie;
   dossierState.doc = doc;
   zetShareUrl(doc);
 
+  const dossier = $('dossier');
   $('stage').classList.add('weg');
-  $('dossier').classList.add('open');
+  dossier.classList.add('open');
+  dossier.setAttribute('aria-busy', 'true');
 
   const [straat, rest] = splitsNaam(doc.weergavenaam);
   dossierState.adres = straat;
@@ -28,7 +31,12 @@ export async function toonDossier(doc) {
   $('d-adres').textContent = dossierState.adres;
   $('d-plaats').textContent = dossierState.plaats;
 
-  ['s-bouwjaar', 's-opp', 's-woz'].forEach(id => { $(id).classList.add('skelet'); $(id).textContent = '0000'; });
+  ['s-bouwjaar', 's-opp', 's-woz'].forEach(id => {
+    const el = $(id);
+    el.classList.add('skelet');
+    el.textContent = '';
+    el.setAttribute('aria-hidden', 'true');
+  });
   $('chips').innerHTML = '';
   $('woz-status').textContent = 'Waarden ophalen…';
   $('woz-status').className = 'status';
@@ -60,14 +68,22 @@ export async function toonDossier(doc) {
   if ($('ov-inhoud')) $('ov-inhoud').style.display = 'none';
 
   const [lon, lat] = parsePoint(doc.centroide_ll);
+
   toonLocatie(lat, lon);
-  laadBag(doc);
-  laadWoz(doc);
-  laadEnergielabel(doc);
-  laadMonumenten(lat, lon);
-  laadCbs(doc);
-  laadNabijheid(doc, lat, lon);
-  laadOv(lat, lon);
+  await Promise.allSettled([
+    laadBag(doc, gen),
+    laadWoz(doc, gen),
+    laadEnergielabel(doc, gen),
+    laadMonumenten(lat, lon, gen),
+    laadCbs(doc, gen),
+    laadNabijheid(doc, lat, lon, gen),
+    laadOv(lat, lon, gen),
+  ]);
+
+  if (gen === dossierState.generatie) {
+    dossier.setAttribute('aria-busy', 'false');
+    ['s-bouwjaar', 's-opp', 's-woz'].forEach(id => $(id)?.removeAttribute('aria-hidden'));
+  }
 
   applyPendingUnlock();
   updatePremiumUi();
@@ -80,12 +96,14 @@ export async function openDossier(lookupId) {
 }
 
 export function sluitDossier(input) {
-  $('dossier').classList.remove('open');
+  const dossier = $('dossier');
+  dossier.classList.remove('open');
+  dossier.setAttribute('aria-busy', 'false');
   $('stage').classList.remove('weg');
   resetKaart();
   resetDossierState();
   wisShareUrl();
   updatePremiumUi();
-  input.focus();
-  input.select();
+  input?.focus();
+  input?.select();
 }

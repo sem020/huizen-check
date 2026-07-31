@@ -1,5 +1,5 @@
 import { $, apiUrl } from './config.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 
 function formatDatum(iso) {
   if (!iso) return null;
@@ -54,7 +54,7 @@ function toonLabel(label) {
   $('el-meta').textContent = meta.join(' · ') || 'Geregistreerd in EP-Online';
 }
 
-export async function laadEnergielabel(doc) {
+export async function laadEnergielabel(doc, gen) {
   const status = $('el-status');
   const box = $('el-inhoud');
   if (status) {
@@ -62,14 +62,14 @@ export async function laadEnergielabel(doc) {
     status.className = 'status';
   }
   if (box) box.style.display = 'none';
-  dossierState.energielabel = null;
+  if (isActieveGeneratie(gen)) dossierState.energielabel = null;
 
   const vbo = doc.adresseerbaarobject_id;
   const params = new URLSearchParams();
   if (vbo) params.set('vbo', vbo);
   else {
     if (!doc.postcode || !doc.huis_nlt && !doc.huisnummer) {
-      if (status) status.textContent = 'Onvoldoende adresgegevens voor energielabel.';
+      if (isActieveGeneratie(gen) && status) status.textContent = 'Onvoldoende adresgegevens voor energielabel.';
       return;
     }
     params.set('postcode', doc.postcode);
@@ -81,6 +81,7 @@ export async function laadEnergielabel(doc) {
   try {
     const r = await fetch(apiUrl('/api/energielabel?' + params));
     const j = await r.json();
+    if (!isActieveGeneratie(gen)) return;
     if (r.status === 404) {
       toonLabel(null);
       return;
@@ -88,6 +89,7 @@ export async function laadEnergielabel(doc) {
     if (!r.ok) throw new Error(j.error || 'Fout ' + r.status);
     toonLabel(j.label);
   } catch (e) {
+    if (!isActieveGeneratie(gen)) return;
     if (status) {
       status.innerHTML = `Kon energielabel niet ophalen. <a href="https://www.ep-online.nl/" target="_blank" rel="noopener">Open EP-Online</a>`;
       status.className = 'status f';

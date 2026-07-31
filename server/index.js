@@ -48,6 +48,7 @@ app.get('/pand/:slug', (req, res) => {
     title: `${label} — Pandloket`,
     description: `Openbare gegevens over ${label}: bouwjaar, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële registers.`,
     canonical,
+    placeName: label,
   });
   res.type('html').send(html);
 });

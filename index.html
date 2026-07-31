@@ -14,9 +14,14 @@
 <meta property="og:title" content="Pandloket — open data over elk Nederlands adres">
 <meta property="og:description" content="Zoek een adres en zie gratis bouwjaar, woonoppervlak, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële open bronnen.">
 <meta property="og:url" content="https://pandloket.nl/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://pandloket.nl/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pandloket — open data over elk Nederlands adres">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pandloket — open data over elk Nederlands adres">
 <meta name="twitter:description" content="Zoek een adres en zie gratis bouwjaar, woonoppervlak, WOZ-waarde, energielabel, buurtcijfers en meer uit officiële open bronnen.">
+<meta name="twitter:image" content="https://pandloket.nl/og-image.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -78,21 +83,21 @@
     <p>Bouwjaar, woonoppervlak, WOZ-waarde en meer open data — gratis in de browser.</p>
     <div class="zoek">
       <input id="adres" type="text" autocomplete="off" spellcheck="false" enterkeyhint="search"
-             placeholder="Zoek een adres, bv. Herengracht 123 Amsterdam" aria-label="Zoek een adres">
-      <span class="lens">⌕</span>
-      <div class="sug" id="sug" role="listbox"></div>
-    </div>
-    <div class="voorbeelden" id="voorbeelden">
-      <button type="button">Herengracht 123 Amsterdam</button>
-      <button type="button">Elandsgracht 84 Amsterdam</button>
-      <button type="button">Kerkstraat 12 Utrecht</button>
+             placeholder="Bijv. Herengracht 123 Amsterdam"
+             aria-label="Zoek een adres"
+             aria-autocomplete="list"
+             aria-controls="sug"
+             aria-expanded="false"
+             role="combobox">
+      <span class="lens" aria-hidden="true">⌕</span>
+      <div class="sug" id="sug" role="listbox" aria-label="Adressuggesties"></div>
     </div>
     <div class="melding" id="melding"></div>
   </div>
   <div class="kaart-ruimte" aria-hidden="true"></div>
 </div>
 
-<aside class="dossier" id="dossier" aria-live="polite">
+<aside class="dossier" id="dossier" aria-busy="false">
   <div class="dossier-acties">
     <button type="button" class="deel" id="deel" aria-label="Adres delen">Deel</button>
     <button type="button" class="sluit" id="sluit" aria-label="Dossier sluiten">✕</button>
@@ -102,10 +107,10 @@
     <h2 class="d-adres" id="d-adres">—</h2>
     <div class="d-plaats" id="d-plaats">—</div>
 
-    <div class="stats">
-      <div class="stat"><div class="n skelet" id="s-bouwjaar">0000</div><div class="l">Bouwjaar</div></div>
-      <div class="stat"><div class="n skelet" id="s-opp">000 m²</div><div class="l">Oppervlak</div></div>
-      <div class="stat"><div class="n skelet" id="s-woz">€ 000k</div><div class="l">WOZ</div></div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><div class="n skelet" id="s-bouwjaar" aria-hidden="true"></div><div class="l">Bouwjaar</div></div>
+      <div class="stat"><div class="n skelet" id="s-opp" aria-hidden="true"></div><div class="l">Oppervlak</div></div>
+      <div class="stat"><div class="n skelet" id="s-woz" aria-hidden="true"></div><div class="l">WOZ</div></div>
     </div>
     <div class="chips" id="chips"></div>
 
@@ -206,7 +211,7 @@
 
     <div class="advies">
       <h3>Dit huis serieus op het oog?</h3>
-      <p>Open data vertelt niet alles. Een bouwkundige keuring wél. <a href="#" rel="sponsored">Vergelijk keurders →</a></p>
+      <p>Open data vertelt niet alles — controleer altijd bij de bron en overweeg een bouwkundige keuring bij aankoop.</p>
     </div>
   </div>
   <div class="d-voet">Gegevens live uit openbare registers (Kadaster/PDOK, Waarderingskamer, CBS, EP-Online). Fouten voorbehouden; hieraan kunnen geen rechten worden ontleend. <a href="/over">Bronnen &amp; over</a> · <a href="/av">Voorwaarden</a> · <a href="/privacy">Privacy</a></div>

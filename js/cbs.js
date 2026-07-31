@@ -1,5 +1,5 @@
 import { $, apiUrl } from './config.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 
 function fmtN(n) {
   if (n == null) return '—';
@@ -12,7 +12,7 @@ function fmtEurK(n) {
   return '€ ' + Math.round(n / 1000) + 'k';
 }
 
-export async function laadCbs(doc) {
+export async function laadCbs(doc, gen) {
   const status = $('cbs-status');
   const box = $('cbs-inhoud');
   if (status) {
@@ -20,11 +20,11 @@ export async function laadCbs(doc) {
     status.className = 'status';
   }
   if (box) box.style.display = 'none';
-  dossierState.cbs = null;
+  if (isActieveGeneratie(gen)) dossierState.cbs = null;
 
   const buurt = doc.buurtnaam;
   if (!buurt) {
-    if (status) status.textContent = 'Geen buurt bekend voor dit adres.';
+    if (isActieveGeneratie(gen) && status) status.textContent = 'Geen buurt bekend voor dit adres.';
     return;
   }
 
@@ -35,6 +35,7 @@ export async function laadCbs(doc) {
   try {
     const r = await fetch(apiUrl('/api/cbs-buurt?' + params));
     const j = await r.json();
+    if (!isActieveGeneratie(gen)) return;
     if (r.status === 404) {
       if (status) status.textContent = 'Geen CBS-cijfers gevonden voor deze buurt.';
       return;
@@ -65,6 +66,7 @@ export async function laadCbs(doc) {
       `<div class="cbs-cel"><div class="cbs-v">${v}</div><div class="cbs-l">${l}</div></div>`
     ).join('');
   } catch (e) {
+    if (!isActieveGeneratie(gen)) return;
     if (status) {
       status.innerHTML = `Kon CBS-cijfers niet ophalen. <a href="https://www.cbsinuwbuurt.nl/" target="_blank" rel="noopener">CBS in uw buurt</a>`;
       status.className = 'status f';

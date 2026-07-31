@@ -1,5 +1,5 @@
 import { $, apiUrl } from './config.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 import { toonSupermarktenOpKaart } from './map.js';
 
 function fmtKm(km) {
@@ -78,7 +78,7 @@ function tekenGrid(n, supermarket) {
   $('nabij-grid').innerHTML = cells.join('');
 }
 
-export async function laadNabijheid(doc, lat, lon) {
+export async function laadNabijheid(doc, lat, lon, gen) {
   const status = $('nabij-status');
   const box = $('nabij-inhoud');
   if (status) {
@@ -86,12 +86,14 @@ export async function laadNabijheid(doc, lat, lon) {
     status.className = 'status';
   }
   if (box) box.style.display = 'none';
-  dossierState.nabijheid = null;
-  toonSupermarktenOpKaart([]);
+  if (isActieveGeneratie(gen)) {
+    dossierState.nabijheid = null;
+    toonSupermarktenOpKaart([]);
+  }
 
   const buurt = doc.buurtnaam;
   if (!buurt && !(Number.isFinite(lat) && Number.isFinite(lon))) {
-    if (status) status.textContent = 'Geen buurt of coördinaten voor nabijheid.';
+    if (isActieveGeneratie(gen) && status) status.textContent = 'Geen buurt of coördinaten voor nabijheid.';
     return;
   }
 
@@ -100,6 +102,7 @@ export async function laadNabijheid(doc, lat, lon) {
       buurt ? haalCbsNabijheid(doc) : Promise.resolve(null),
       haalSupermarkten(lat, lon),
     ]);
+    if (!isActieveGeneratie(gen)) return;
 
     const n = cbsResult.status === 'fulfilled' ? cbsResult.value : null;
     const smData = smResult.status === 'fulfilled' ? smResult.value : { supermarket: null, supermarkets: [] };
@@ -166,6 +169,7 @@ export async function laadNabijheid(doc, lat, lon) {
       console.warn('Supermarkt:', smResult.reason?.message);
     }
   } catch (e) {
+    if (!isActieveGeneratie(gen)) return;
     if (status) {
       status.innerHTML = `Kon nabijheid niet ophalen. <a href="https://www.cbs.nl/nl-nl/cijfers/detail/86270NED" target="_blank" rel="noopener">CBS Nabijheid</a>`;
       status.className = 'status f';

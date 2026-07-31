@@ -1,5 +1,5 @@
 import { $, apiUrl } from './config.js';
-import { dossierState } from './state.js';
+import { dossierState, isActieveGeneratie } from './state.js';
 
 function fmtAfstand(m) {
   if (m == null) return '';
@@ -7,7 +7,7 @@ function fmtAfstand(m) {
   return `± ${m} m`;
 }
 
-export async function laadMonumenten(lat, lon) {
+export async function laadMonumenten(lat, lon, gen) {
   const status = $('mon-status');
   const box = $('mon-inhoud');
   if (status) {
@@ -15,16 +15,17 @@ export async function laadMonumenten(lat, lon) {
     status.className = 'status';
   }
   if (box) box.style.display = 'none';
-  dossierState.monumenten = null;
+  if (isActieveGeneratie(gen)) dossierState.monumenten = null;
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    if (status) status.textContent = 'Geen coördinaten voor monumentencheck.';
+    if (isActieveGeneratie(gen) && status) status.textContent = 'Geen coördinaten voor monumentencheck.';
     return;
   }
 
   try {
     const r = await fetch(apiUrl(`/api/monumenten?lat=${lat}&lon=${lon}&straal=60`));
     const j = await r.json();
+    if (!isActieveGeneratie(gen)) return;
     if (!r.ok) throw new Error(j.error || 'Fout ' + r.status);
 
     dossierState.monumenten = j;
@@ -75,6 +76,7 @@ export async function laadMonumenten(lat, lon) {
     }
     lijst.innerHTML = links.length ? links.join('') : '';
   } catch (e) {
+    if (!isActieveGeneratie(gen)) return;
     if (status) {
       status.innerHTML = `Kon monumenten niet ophalen. <a href="https://monumentenregister.cultureelerfgoed.nl/" target="_blank" rel="noopener">Open register</a>`;
       status.className = 'status f';
