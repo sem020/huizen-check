@@ -109,9 +109,11 @@ function bouwHtml() {
     const afst = h.afstandM < 1000 ? `${h.afstandM} m` : `${(h.afstandM / 1000).toLocaleString('nl-NL', { maximumFractionDigits: 1 })} km`;
     return `<div class="ov-row"><span class="ov-s">${esc(soort)}</span><span>${esc(h.naam)}</span><strong>${esc(afst)}</strong></div>`;
   }).join('');
-  const ovBlock = ovRows ? `
-    <h2><i></i>Dichtstbijzijnde OV</h2>
-    <div class="ov">${ovRows}</div>` : '';
+  const ovBlock = ovRows
+    ? `<h2><i></i>Dichtstbijzijnde OV</h2><div class="ov">${ovRows}</div>`
+    : (ov?.beschikbaar === false
+      ? `<h2><i></i>Dichtstbijzijnde OV</h2><p class="leeg">OV-halten tijdelijk niet beschikbaar.</p>`
+      : '');
 
   return `<!DOCTYPE html>
 <html lang="nl">

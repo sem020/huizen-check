@@ -16,8 +16,7 @@ const SOORT_LABEL = {
   ov: 'OV',
 };
 
-const COLD_MSG =
-  'OV-halten ophalen… De eerste keer kan dit tot een minuut duren (haltebestand wordt geladen).';
+const COLD_MSG = 'OV-halten ophalen…';
 
 function bindRetry(status, lat, lon, gen) {
   const btn = status?.querySelector('[data-ov-retry]');
@@ -54,6 +53,16 @@ export async function laadOv(lat, lon, gen) {
 
     dossierState.ov = j;
     if (!box || !status) return;
+
+    if (j.beschikbaar === false) {
+      status.innerHTML =
+        `OV-halten zijn tijdelijk niet beschikbaar. ` +
+        `<button type="button" class="status-retry" data-ov-retry>Opnieuw proberen</button>`;
+      status.className = 'status f';
+      bindRetry(status, lat, lon, gen);
+      toonOvOpKaart([]);
+      return;
+    }
 
     const halten = j.halten || [];
     if (!halten.length) {

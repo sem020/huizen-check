@@ -38,22 +38,29 @@ async function haalCbsNabijheid(doc) {
   return j.nabijheid;
 }
 
-/** @returns {Promise<{ supermarket: object|null, supermarkets: object[] }>} */
+/** @returns {Promise<{ supermarket: object|null, supermarkets: object[], beschikbaar: boolean }>} */
 async function haalSupermarkten(lat, lon) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return { supermarket: null, supermarkets: [] };
+    return { supermarket: null, supermarkets: [], beschikbaar: false };
   }
-  const r = await fetch(apiUrl(`/api/supermarkt-dichtbij?lat=${lat}&lon=${lon}&straal=1500&limiet=8`));
-  const j = await r.json();
-  if (!r.ok) throw new Error(j.error || 'Fout ' + r.status);
-  const lijst = Array.isArray(j.supermarkets) ? j.supermarkets : (j.supermarket ? [j.supermarket] : []);
-  return {
-    supermarket: j.supermarket || lijst[0] || null,
-    supermarkets: lijst,
-  };
+  try {
+    const r = await fetch(apiUrl(`/api/supermarkt-dichtbij?lat=${lat}&lon=${lon}&straal=1500&limiet=8`));
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.beschikbaar === false) {
+      return { supermarket: null, supermarkets: [], beschikbaar: false };
+    }
+    const lijst = Array.isArray(j.supermarkets) ? j.supermarkets : (j.supermarket ? [j.supermarket] : []);
+    return {
+      supermarket: j.supermarket || lijst[0] || null,
+      supermarkets: lijst,
+      beschikbaar: true,
+    };
+  } catch {
+    return { supermarket: null, supermarkets: [], beschikbaar: false };
+  }
 }
 
-function tekenGrid(n, supermarket) {
+function tekenGrid(n, supermarket, beschikbaar) {
   const a = n?.afstanden || {};
   const cells = [];
 
@@ -62,6 +69,12 @@ function tekenGrid(n, supermarket) {
       <div class="cbs-v">${fmtM(supermarket.afstandM)}</div>
       <div class="cbs-l">Supermarkt</div>
       <div class="cbs-sub">${supermarket.naam}</div>
+    </div>`);
+  } else if (beschikbaar === false) {
+    cells.push(`<div class="cbs-cel cbs-cel-adres">
+      <div class="cbs-v">—</div>
+      <div class="cbs-l">Supermarkt</div>
+      <div class="cbs-sub">tijdelijk niet beschikbaar</div>
     </div>`);
   } else {
     cells.push(`<div class="cbs-cel cbs-cel-adres">
@@ -76,6 +89,15 @@ function tekenGrid(n, supermarket) {
   }
 
   $('nabij-grid').innerHTML = cells.join('');
+}
+
+function bindRetry(status, doc, lat, lon, gen) {
+  const btn = status?.querySelector('[data-nabij-retry]');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (!isActieveGeneratie(gen)) return;
+    laadNabijheid(doc, lat, lon, gen);
+  });
 }
 
 export async function laadNabijheid(doc, lat, lon, gen) {
@@ -105,15 +127,26 @@ export async function laadNabijheid(doc, lat, lon, gen) {
     if (!isActieveGeneratie(gen)) return;
 
     const n = cbsResult.status === 'fulfilled' ? cbsResult.value : null;
-    const smData = smResult.status === 'fulfilled' ? smResult.value : { supermarket: null, supermarkets: [] };
+    const smData = smResult.status === 'fulfilled'
+      ? smResult.value
+      : { supermarket: null, supermarkets: [], beschikbaar: false };
     const supermarket = smData.supermarket;
     const supermarkets = smData.supermarkets || [];
+    const smBeschikbaar = smData.beschikbaar !== false;
 
     if (cbsResult.status === 'rejected' && smResult.status === 'rejected') {
       throw cbsResult.reason || smResult.reason;
     }
 
     if (!n && !supermarket) {
+      if (status && smData.beschikbaar === false) {
+        status.innerHTML =
+          `Supermarkten zijn tijdelijk niet beschikbaar. ` +
+          `<button type="button" class="status-retry" data-nabij-retry>Opnieuw proberen</button>`;
+        status.className = 'status f';
+        bindRetry(status, doc, lat, lon, gen);
+        return;
+      }
       if (status) status.textContent = 'Geen nabijheidsgegevens gevonden.';
       return;
     }
@@ -159,7 +192,7 @@ export async function laadNabijheid(doc, lat, lon, gen) {
     }
     $('nabij-naam').textContent = delen.join(' · ') || 'Nabijheid';
 
-    tekenGrid(n, supermarket);
+    tekenGrid(n, supermarket, smBeschikbaar);
     toonSupermarktenOpKaart(supermarkets);
 
     if (cbsResult.status === 'rejected') {

@@ -1,0 +1,9 @@
+{
+  "source": "gtfs-nl",
+  "url": "https://gtfs.ovapi.nl/gtfs-nl.zip",
+  "license": "CC0-1.0",
+  "updatedAt": "2026-11-26T21:07:44.000Z",
+  "stops": 82480,
+  "bytesUncompressed": 4627643,
+  "note": "Subset van stops.txt (NL-bbox, location_type 0 en 1). De GOVI-zip bevat geen stops.txt."
+}

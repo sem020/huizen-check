@@ -348,7 +348,9 @@ function genereerPdfBestand(order) {
       doc.moveDown(0.4);
     } else {
       doc.fillColor(COLORS.dim).font('Helvetica').fontSize(9)
-        .text('Geen OV-halte in de buurt gevonden.');
+        .text(d.ov?.beschikbaar === false
+          ? 'OV-halten tijdelijk niet beschikbaar.'
+          : 'Geen OV-halte in de buurt gevonden.');
       doc.moveDown(0.8);
     }
 

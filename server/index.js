@@ -1,5 +1,6 @@
 const express = require('express');
-const { join } = require('path');
+const path = require('path');
+const { join } = path;
 const { existsSync } = require('fs');
 const { config, assertPaymentConfig, priceLabel } = require('./config.js');
 const { getOrder, pdfPath } = require('./store.js');
@@ -147,6 +148,30 @@ app.get('/api/cbs-nabijheid', async (req, res) => {
   }
 });
 
+function ovNietBeschikbaar(straal) {
+  const straalM = Math.min(Math.max(Number(straal) || 1500, 200), 5000);
+  return {
+    halten: [],
+    straalM,
+    bron: 'OVapi GTFS (OpenOV)',
+    bronUrl: 'https://gtfs.ovapi.nl/',
+    bijgewerkt: null,
+    beschikbaar: false,
+  };
+}
+
+function supermarktNietBeschikbaar(straal) {
+  const straalM = Math.min(Math.max(Number(straal) || 1500, 300), 3000);
+  return {
+    supermarket: null,
+    supermarkets: [],
+    straalM,
+    bron: 'OpenStreetMap (Overpass)',
+    bronUrl: 'https://www.openstreetmap.org/',
+    beschikbaar: false,
+  };
+}
+
 app.get('/api/ov-dichtbij', async (req, res) => {
   try {
     const lat = Number(req.query.lat);
@@ -157,8 +182,11 @@ app.get('/api/ov-dichtbij', async (req, res) => {
     });
     res.json(data);
   } catch (e) {
+    if (e.status === 400) {
+      return res.status(400).json({ error: e.message || 'lat/lon verplicht' });
+    }
     console.error('OV:', e.message);
-    res.status(e.status || 500).json({ error: e.message || 'OV-halten ophalen mislukt' });
+    res.json(ovNietBeschikbaar(req.query.straal));
   }
 });
 
@@ -172,8 +200,11 @@ app.get('/api/supermarkt-dichtbij', async (req, res) => {
     });
     res.json(data);
   } catch (e) {
+    if (e.status === 400) {
+      return res.status(400).json({ error: e.message || 'lat/lon verplicht' });
+    }
     console.error('Supermarkt:', e.message);
-    res.status(e.status || 500).json({ error: e.message || 'Supermarkt ophalen mislukt' });
+    res.json(supermarktNietBeschikbaar(req.query.straal));
   }
 });
 
@@ -243,14 +274,69 @@ app.get('/api/orders/:id/pdf', (req, res) => {
   res.download(file, naam);
 });
 
-app.use(express.static(root, {
+const PUBLIC_ROOT_FILES = new Set([
+  'index.html',
+  'over.html',
+  'privacy.html',
+  'av.html',
+  'bedankt.html',
+  'mock-pay.html',
+  'panddossier.html',
+  'pandloket.html',
+  'og-image.png',
+  'favicon.ico',
+  'favicon.png',
+  'apple-touch-icon.png',
+]);
+const PUBLIC_DIRS = new Set(['css', 'js']);
+
+/** Alleen pagina's en assets. server/, package.json, .env en de rest blijven dicht. */
+function isPublicAssetPath(urlPath) {
+  let decoded;
+  try {
+    decoded = decodeURIComponent(urlPath);
+  } catch {
+    return false;
+  }
+  if (decoded.includes('\0')) return false;
+  const rel = decoded.replace(/^\/+/, '').replace(/\\/g, '/');
+  if (!rel) return true;
+  const normalized = path.posix.normalize(rel);
+  if (
+    normalized === '..' ||
+    normalized.startsWith('../') ||
+    normalized.startsWith('/') ||
+    normalized.includes('\0')
+  ) {
+    return false;
+  }
+  const parts = normalized.split('/');
+  if (parts.some(part => !part || part === '.' || part === '..')) return false;
+  if (parts.length === 1) {
+    const name = parts[0];
+    if (PUBLIC_ROOT_FILES.has(name)) return true;
+    if (!name.includes('.') && PUBLIC_ROOT_FILES.has(`${name}.html`)) return true;
+    return false;
+  }
+  return PUBLIC_DIRS.has(parts[0]);
+}
+
+const publicStatic = express.static(root, {
   extensions: ['html'],
-  setHeaders(res, path) {
-    if (path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.html')) {
+  index: 'index.html',
+  dotfiles: 'ignore',
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.js') || filePath.endsWith('.css') || filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-cache');
     }
   },
-}));
+});
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  if (!isPublicAssetPath(req.path)) return next();
+  return publicStatic(req, res, next);
+});
 
 // Eerst proberen op HOST (default 0.0.0.0); bij EADDRNOTAVAIL zonder host.
 function startListening(host) {
@@ -264,8 +350,8 @@ function startListening(host) {
     console.log(`  e-mail:   ${config.resendApiKey ? 'Resend' : 'mock (console)'}`);
     console.log(`  EP-Online:${config.epOnlineApiKey ? ' geconfigureerd' : ' geen key'}`);
     console.log('');
-    // Uitstellen: GTFS-download bij start kan shared plans OOM'en → 503.
-    setTimeout(() => warmOvCache(), 30_000);
+    // Lokaal haltebestand inlezen. Een netwerk-refresh is begrensd en blokkeert niet.
+    setTimeout(() => warmOvCache(), 5_000);
   });
 
   server.on('error', (err) => {
@@ -279,4 +365,9 @@ function startListening(host) {
   });
 }
 
-startListening(config.host);
+if (process.env.PANDLOKET_NO_LISTEN !== '1') {
+  startListening(config.host);
+}
+
+exports.app = app;
+exports.isPublicAssetPath = isPublicAssetPath;
